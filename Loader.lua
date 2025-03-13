@@ -1,15 +1,5 @@
 local config = _G.LSDropper
 
--- Removed whitelist key check for keyless operation.
---[[
-if(config.WhitelistKey == "FREETRIAL2022") then whitelisted = true end
-if(whitelisted == false) then
-    messagebox("Do NOT attempt to pirate LS Software. Your IP address has been logged.", "LS", 0)
-    error("Do NOT attempt to pirate LS Software. Your IP address has been logged.")
-    return
-end
-]]--
-
 if (_G.LSLoaded == true) then
     messagebox("Make sure you only execute LS once.", "LS", 0)
     error("Make sure you only execute LS once.")
@@ -29,7 +19,7 @@ setfpscap(5)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
 print("Loading Commands...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/diz-zzyy/AgonyDropper/main/Commands.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/Commands.lua"))()
 print("Commands Loaded!")
 
 local VirtualUser = game:GetService("VirtualUser")
@@ -71,7 +61,7 @@ print("Command Handler ready.")
 
 print("Loading Libraries...")
 loadstring(game:HttpGet("https://raw.githubusercontent.com/PickleIsDaBest/Min/main/Skript"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/diz-zzyy/AgonyDropper/main/scripts/DeleteChairs.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
 print("Libraries loaded.")
 print("LS loaded!")
 

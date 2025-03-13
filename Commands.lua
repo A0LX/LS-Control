@@ -87,7 +87,7 @@ cmds["start"] = function(args, p)
   game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Started Dropping!", "All")
   dropping = true
   repeat
-    game.ReplicatedStorage.MainEvent:FireServer("DropMoney", 10000)
+    game.ReplicatedStorage.MainEvent:FireServer("DropMoney", 17500)
     wait(0.3)
   until dropping == false
 end
@@ -180,10 +180,22 @@ do
    end)
 end
 
-cmds["float"] = function(args, p)
+cmds["airlock"] = function(args, p)
    airwalkState = not airwalkState
 end
 
+cmds["spot"] = function(args, p)
+    if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+        local controllerRoot = p.Character.HumanoidRootPart
+        local targetCFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
+        player.Character.HumanoidRootPart.CFrame = targetCFrame
+        player.Character.HumanoidRootPart.Anchored = true
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Spot!", "All")
+    else
+        warn("Controller's HumanoidRootPart not found; cannot execute spot command.")
+    end
+end
+    
 ---------------------------------------------------------------
 
 _G.LSCommands = cmds
