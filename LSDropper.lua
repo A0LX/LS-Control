@@ -9,4 +9,4 @@ _G.LSDropper = {
 }
 
 -- Loader: Loads the script.
-loadstring(game:HttpGet("https://raw.githubusercontent.com/diz-zzyy/AgonyDropper/main/Loader.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/Loader.lua"))()

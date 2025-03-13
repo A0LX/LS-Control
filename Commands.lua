@@ -11,7 +11,7 @@ blocking = false
 
 ---------------------------------------------------------------
 
-cmds["respawn"] = function(args, p)
+cmds["re"] = function(args, p)
   local origin_spot = player.Character.HumanoidRootPart.CFrame
   player.Character.Humanoid.Health = 0
   wait(7.5)
@@ -43,7 +43,6 @@ cmds["tp"] = function(args, p)
        if (string.lower(args[1]) == "bank") then 
            player.Character.HumanoidRootPart.CFrame = CFrame.new(-437.125885, 38.9783134, -285.587372, 0.0165725499, 5.298579e-08, -0.99986279, 1.16139711e-08, 1, 5.31855591e-08, 0.99986279, -1.24937944e-08, 0.0165725499)
        end
-       -- Removed "admin" and "lava" teleport locations.
        if (string.lower(args[1]) == "safezone1") then 
            player.Character.HumanoidRootPart.CFrame = CFrame.new(-117.270287, -58.7000618, 146.536087, 0.999873519, 5.21876942e-08, -0.0159031227, -5.22713037e-08, 1, -4.84179008e-09, 0.0159031227, 5.67245495e-09, 0.999873519)
        end
@@ -67,7 +66,6 @@ cmds["tpf"] = function(args, p)
        if (string.lower(args[1]) == "bank") then 
            player.Character.HumanoidRootPart.CFrame = CFrame.new(-437.125885, 38.9783134, -285.587372, 0.0165725499, 5.298579e-08, -0.99986279, 1.16139711e-08, 1, 5.31855591e-08, 0.99986279, -1.24937944e-08, 0.0165725499)
        end
-       -- Removed "admin" and "lava" teleport locations.
        if (string.lower(args[1]) == "safezone1") then 
            player.Character.HumanoidRootPart.CFrame = CFrame.new(-117.270287, -58.7000618, 146.536087, 0.999873519, 5.21876942e-08, -0.0159031227, -5.22713037e-08, 1, -4.84179008e-09, 0.0159031227, 5.67245495e-09, 0.999873519)
        end
@@ -128,11 +126,6 @@ cmds["wallet"] = function(args, p)
   end
 end
 
-cmds["crash"] = function(args, p)
-  -- Custom crash soon to come
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/BetterDaHood/BetterDaHoodCrasher/main/Crash'))()
-end
-
 local testsquadAIR = {
    Airwalk = Enum.KeyCode.LeftAlt;
 }
@@ -189,14 +182,6 @@ end
 
 cmds["float"] = function(args, p)
    airwalkState = not airwalkState
-end
-
--- New setup command to lock alts in place
-cmds["setup"] = function(args, p)
-   if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-       player.Character.HumanoidRootPart.Anchored = true
-       game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Setup complete. Alts are locked in place.", "All")
-   end
 end
 
 ---------------------------------------------------------------
