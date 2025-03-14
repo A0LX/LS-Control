@@ -9,11 +9,11 @@ else
     _G.LSLoaded = true 
 end
 
-if game.PlaceId ~= 2788229376 then
-    messagebox("You are not in the correct game, please ensure you are in 'Da Hood'.", "LS", 0)
-    error("You are not in the correct game, please ensure you are in 'Da Hood'.")
-    return
-end
+--if game.PlaceId ~= 2788229376 then
+--    messagebox("You are not in the correct game, please ensure you are in 'Da Hood'.", "LS", 0)
+--    error("You are not in the correct game, please ensure you are in 'Da Hood'.")
+  --  return
+--end
 
 setfpscap(5)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
@@ -60,7 +60,7 @@ end)
 print("Command Handler ready.")
 
 print("Loading Libraries...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/PickleIsDaBest/Min/main/Skript"))()
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/PickleIsDaBest/Min/main/Skript"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
 print("Libraries loaded.")
 print("LS loaded!")
