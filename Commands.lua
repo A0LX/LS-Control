@@ -40,9 +40,85 @@ cmds["tp"] = function(args, p)
      game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Please input place to teleport to.", "All")
   else
        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Teleporting to '" .. args[1] .. "'!", "All")
-       if (string.lower(args[1]) == "bank") then 
-           player.Character.HumanoidRootPart.Anchored = false
-           player.Character.HumanoidRootPart.CFrame = CFrame.new(-437.125885, 38.9783134, -285.587372, 0.0165725499, 5.298579e-08, -0.99986279, 1.16139711e-08, 1, 5.31855591e-08, 0.99986279, -1.24937944e-08, 0.0165725499)
+      if (string.lower(args[1]) == "bank") then
+      player.Character.HumanoidRootPart.Anchored = false
+           if i == "Alt1" or i == 1 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-389, 21, -338)
+           elseif i == "Alt2" or i == 2 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-385, 21, -338)
+           elseif i == "Alt3" or i == 3 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-380, 21, -337)
+           elseif i == "Alt4" or i == 4 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-376, 21, -338)
+           elseif i == "Alt5" or i == 5 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-370, 21, -338)
+           elseif i == "Alt6" or i == 6 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-366, 21, -338)
+           elseif i == "Alt7" or i == 7 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -338)
+           elseif i == "Alt8" or i == 8 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -333)
+           elseif i == "Alt9" or i == 9 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-365, 21, -334)
+           elseif i == "Alt10" or i == 10 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-370, 21, -334)
+           elseif i == "Alt11" or i == 11 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-375, 21, -334)
+           elseif i == "Alt12" or i == 12 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-381, 21, -334)
+           elseif i == "Alt13" or i == 13 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-386, 21, -334)
+           elseif i == "Alt14" or i == 14 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -334)
+           elseif i == "Alt15" or i == 15 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -331)
+           elseif i == "Alt16" or i == 16 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-386, 21, -331)
+           elseif i == "Alt17" or i == 17 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-382, 21, -331)
+           elseif i == "Alt18" or i == 18 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-376, 21, -331)
+           elseif i == "Alt19" or i == 19 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-371, 21, -331)
+           elseif i == "Alt20" or i == 20 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-366, 21, -331)
+           elseif i == "Alt21" or i == 21 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -331)
+           elseif i == "Alt22" or i == 22 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -327)
+           elseif i == "Alt23" or i == 23 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-365, 21, -327)
+           elseif i == "Alt24" or i == 24 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-371, 21, -326)
+           elseif i == "Alt25" or i == 25 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-376, 21, -327)
+           elseif i == "Alt26" or i == 26 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-381, 21, -326)
+           elseif i == "Alt27" or i == 27 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-385, 21, -327)
+           elseif i == "Alt28" or i == 28 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -323)
+           elseif i == "Alt29" or i == 29 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -326)
+           elseif i == "Alt30" or i == 30 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -323)
+           elseif i == "Alt31" or i == 31 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-385, 21, -323)
+           elseif i == "Alt32" or i == 32 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-381, 21, -323)
+           elseif i == "Alt33" or i == 33 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-375, 21, -324)
+           elseif i == "Alt34" or i == 34 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-370, 21, -323)
+           elseif i == "Alt35" or i == 35 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-365, 21, -324)
+           elseif i == "Alt36" or i == 36 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-360, 21, -324)
+           elseif i == "Alt37" or i == 37 then
+              plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-359, 21, -318)
+           elseif i == "Alt38" or i == 38 then
+              plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-364, 21, -319)
+           end
        end
        if (string.lower(args[1]) == "safezone1") then 
            player.Character.HumanoidRootPart.Anchored = false
@@ -70,7 +146,83 @@ cmds["tpf"] = function(args, p)
        player.Character.HumanoidRootPart.Anchored = false
        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Teleporting to '" .. args[1] .. "'!", "All")
        if (string.lower(args[1]) == "bank") then 
-           player.Character.HumanoidRootPart.CFrame = CFrame.new(-437.125885, 38.9783134, -285.587372, 0.0165725499, 5.298579e-08, -0.99986279, 1.16139711e-08, 1, 5.31855591e-08, 0.99986279, -1.24937944e-08, 0.0165725499)
+           if i == "Alt1" or i == 1 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-389, 21, -338)
+           elseif i == "Alt2" or i == 2 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-385, 21, -338)
+           elseif i == "Alt3" or i == 3 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-380, 21, -337)
+           elseif i == "Alt4" or i == 4 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-376, 21, -338)
+           elseif i == "Alt5" or i == 5 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-370, 21, -338)
+           elseif i == "Alt6" or i == 6 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-366, 21, -338)
+           elseif i == "Alt7" or i == 7 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -338)
+           elseif i == "Alt8" or i == 8 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -333)
+           elseif i == "Alt9" or i == 9 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-365, 21, -334)
+           elseif i == "Alt10" or i == 10 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-370, 21, -334)
+           elseif i == "Alt11" or i == 11 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-375, 21, -334)
+           elseif i == "Alt12" or i == 12 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-381, 21, -334)
+           elseif i == "Alt13" or i == 13 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-386, 21, -334)
+           elseif i == "Alt14" or i == 14 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -334)
+           elseif i == "Alt15" or i == 15 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -331)
+           elseif i == "Alt16" or i == 16 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-386, 21, -331)
+           elseif i == "Alt17" or i == 17 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-382, 21, -331)
+           elseif i == "Alt18" or i == 18 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-376, 21, -331)
+           elseif i == "Alt19" or i == 19 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-371, 21, -331)
+           elseif i == "Alt20" or i == 20 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-366, 21, -331)
+           elseif i == "Alt21" or i == 21 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -331)
+           elseif i == "Alt22" or i == 22 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-361, 21, -327)
+           elseif i == "Alt23" or i == 23 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-365, 21, -327)
+           elseif i == "Alt24" or i == 24 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-371, 21, -326)
+           elseif i == "Alt25" or i == 25 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-376, 21, -327)
+           elseif i == "Alt26" or i == 26 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-381, 21, -326)
+           elseif i == "Alt27" or i == 27 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-385, 21, -327)
+           elseif i == "Alt28" or i == 28 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -323)
+           elseif i == "Alt29" or i == 29 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -326)
+           elseif i == "Alt30" or i == 30 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-390, 21, -323)
+           elseif i == "Alt31" or i == 31 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-385, 21, -323)
+           elseif i == "Alt32" or i == 32 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-381, 21, -323)
+           elseif i == "Alt33" or i == 33 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-375, 21, -324)
+           elseif i == "Alt34" or i == 34 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-370, 21, -323)
+           elseif i == "Alt35" or i == 35 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-365, 21, -324)
+           elseif i == "Alt36" or i == 36 then
+               plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-360, 21, -324)
+           elseif i == "Alt37" or i == 37 then
+              plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-359, 21, -318)
+           elseif i == "Alt38" or i == 38 then
+              plrLocal.Character.HumanoidRootPart.CFrame = CFrame.new(-364, 21, -319)
+           end
        end
        if (string.lower(args[1]) == "safezone1") then 
            player.Character.HumanoidRootPart.CFrame = CFrame.new(-117.270287, -58.7000618, 146.536087, 0.999873519, 5.21876942e-08, -0.0159031227, -5.22713037e-08, 1, -4.84179008e-09, 0.0159031227, 5.67245495e-09, 0.999873519)
@@ -189,7 +341,11 @@ end
 
 cmds["airlock"] = function(args, p)
    player.Character.HumanoidRootPart.Anchored = false
-   airwalkState = not airwalkState
+   if humanoid then
+       humanoid.Jump = true
+   end
+   wait(0.3)
+   player.Character.HumanoidRootPart.Anchored = true
 end
 
 cmds["spot"] = function(args, p)
