@@ -42,6 +42,7 @@ cmds["tp"] = function(args, p)
        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Teleporting to '" .. args[1] .. "'!", "All")
       if (string.lower(args[1]) == "bank") then
       player.Character.HumanoidRootPart.Anchored = false
+      for i, userId in pairs(_G.alts) do
            if i == "Alt1" or i == 1 then
                player.Character.HumanoidRootPart.CFrame = CFrame.new(-389, 21, -338)
            elseif i == "Alt2" or i == 2 then
