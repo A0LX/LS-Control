@@ -1,7 +1,7 @@
 local config = _G.LSDropper
 
 if (_G.LSLoaded == true) then
-    messagebox("Make sure you only execute LS once.", "LS", 0)
+    warn("Make sure you only execute LS once.")
     error("Make sure you only execute LS once.")
     return
 else
@@ -9,10 +9,13 @@ else
     _G.LSLoaded = true 
 end
 
+-- Limit to very low FPS to reduce overhead.
 setfpscap(5)
+-- Disable 3D rendering for performance reasons on alts.
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
 print("Loading Commands...")
+-- We point to the raw code on your GitHub – adjust if you want a local version
 loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/Commands.lua"))()
 print("Commands Loaded!")
 
@@ -28,25 +31,25 @@ repeat wait() until game:IsLoaded() and game.Players.LocalPlayer.Character ~= ni
 print("Loading Command Handler...")
 
 function Command(player, msg)
-     local cmd = string.split(msg, " ")
-     print("Controller chatted: " .. cmd[1])
-     if (string.sub(string.lower(cmd[1]), 1, 1) == config.Prefix) then
-          local cmd1 = string.lower(cmd[1]):gsub(config.Prefix, "")
-         if (_G.LSCommands[cmd1] ~= nil) then
-             print("Running Command " .. cmd1 .. "...")
-             _G.LSCommands[cmd1]({cmd[2], cmd[3], cmd[4], cmd[5], cmd[6], cmd[7], cmd[8], cmd[9], cmd[10], cmd[11]}, player)
-         end
-     end
+    local cmd = string.split(msg, " ")
+    print("Controller chatted: " .. cmd[1])
+    
+    if (string.sub(string.lower(cmd[1]), 1, 1) == config.Prefix) then
+        local cmd1 = string.lower(cmd[1]):gsub(config.Prefix, "")
+        if (_G.LSCommands[cmd1] ~= nil) then
+            print("Running Command " .. cmd1 .. "...")
+            _G.LSCommands[cmd1]({cmd[2], cmd[3], cmd[4], cmd[5], cmd[6], cmd[7], cmd[8], cmd[9], cmd[10], cmd[11]}, player)
+        end
+    end
 end
 
 game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(Data)
     local Player = game:GetService("Players")[Data.FromSpeaker]
     local Message = Data.Message
-    local Channel = Data.OriginalChannel
-        
-     for _, v in pairs(config.Controllers) do
-       if (tostring(Player.UserId) == tostring(v)) then
-              Command(Player, Message)
+    
+    for _, v in pairs(config.Controllers) do
+        if (tostring(Player.UserId) == tostring(v)) then
+            Command(Player, Message)
         end
     end
 end)
@@ -59,7 +62,7 @@ print("Libraries loaded.")
 print("LS loaded!")
 
 game.StarterGui:SetCore("SendNotification", {
-        Title = "LS";
-        Text = "LS has loaded!";
-        Duration = 10,
+    Title = "LS",
+    Text = "LS has loaded!",
+    Duration = 10,
 })
