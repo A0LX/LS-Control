@@ -189,6 +189,7 @@ cmds["spot"] = function(args, p)
         local controllerRoot = p.Character.HumanoidRootPart
         local targetCFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
         player.Character.HumanoidRootPart.CFrame = targetCFrame
+        wait(0.3)
         player.Character.HumanoidRootPart.Anchored = true
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Spot!", "All")
     else
