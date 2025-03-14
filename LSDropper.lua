@@ -3,7 +3,12 @@ _G.LSDropper = {
     Controllers = {
         "707293189",
     },
-    
+    alts = {
+        [1] = 2939174150,
+        [2] = 3281293170,
+        [3] = 3034352629,
+        [4] = 2827160867,
+    },
     -- Prefix: Enter the prefix before each command.
     Prefix = "/"
 }
