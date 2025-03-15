@@ -74,12 +74,7 @@ local function getAltIndex()
     return nil
 end
 
----------------------------------------------------------------
--- 4) Position arrays for bank, klub, train (no vault/admin)
---    Fill up to [38] if needed.
----------------------------------------------------------------
 local bankPositions = {
-    -- Row 1 (Z = -338):
     [1]  = CFrame.new(-390,   21, -338),
     [2]  = CFrame.new(-383.8, 21, -338),
     [3]  = CFrame.new(-377.6, 21, -338),
@@ -113,18 +108,38 @@ local bankPositions = {
 }
 
 local klubPositions = {
-    [1]  = CFrame.new(-264, 21, -430),
-    [2]  = CFrame.new(-263, 21, -430),
-    [3]  = CFrame.new(-262, 21, -430),
-    [4]  = CFrame.new(-261, 21, -430),
-    [5]  = CFrame.new(-260, 21, -430),
-    [6]  = CFrame.new(-259, 21, -430),
-    [7]  = CFrame.new(-258, 21, -430),
-    [8]  = CFrame.new(-257, 21, -430),
-    [9]  = CFrame.new(-256, 21, -430),
-    [10] = CFrame.new(-255, 21, -430),
-    -- expand to [38] as needed...
+    [1]  = CFrame.new(-290,   -6.2, -404),
+    [2]  = CFrame.new(-277.5, -6.2, -404),
+    [3]  = CFrame.new(-265,   -6.2, -404),
+    [4]  = CFrame.new(-252.5, -6.2, -404),
+    [5]  = CFrame.new(-240,   -6.2, -404),
+    [6]  = CFrame.new(-290,   -6.2, -394),
+    [7]  = CFrame.new(-277.5, -6.2, -394),
+    [8]  = CFrame.new(-265,   -6.2, -394),
+    [9]  = CFrame.new(-252.5, -6.2, -394),
+    [10] = CFrame.new(-240,   -6.2, -394),
+    [11] = CFrame.new(-290,   -6.2, -384),
+    [12] = CFrame.new(-277.5, -6.2, -384),
+    [13] = CFrame.new(-265,   -6.2, -384),
+    [14] = CFrame.new(-252.5, -6.2, -384),
+    [15] = CFrame.new(-240,   -6.2, -384),
+    [16] = CFrame.new(-290,   -6.2, -374),
+    [17] = CFrame.new(-277.5, -6.2, -374),
+    [18] = CFrame.new(-265,   -6.2, -374),
+    [19] = CFrame.new(-252.5, -6.2, -374),
+    [20] = CFrame.new(-240,   -6.2, -374),
+    [21] = CFrame.new(-290,   -6.2, -364),
+    [22] = CFrame.new(-277.5, -6.2, -364),
+    [23] = CFrame.new(-265,   -6.2, -364),
+    [24] = CFrame.new(-252.5, -6.2, -364),
+    [25] = CFrame.new(-240,   -6.2, -364),
+    [26] = CFrame.new(-290,   -6.2, -354),
+    [27] = CFrame.new(-277.5, -6.2, -354),
+    [28] = CFrame.new(-265,   -6.2, -354),
+    [29] = CFrame.new(-252.5, -6.2, -354),
+    [30] = CFrame.new(-240,   -6.2, -354),
 }
+
 
 local trainPositions = {
     [1]  = CFrame.new(600, 34, -150),
