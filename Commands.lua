@@ -552,16 +552,27 @@ end
 ---------------------------------------------------------------
 cmds["airlock"] = function(args, p)
     local char = player.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.Anchored = false
-        local hum = char:FindFirstChild("Humanoid")
-        if hum then
-            hum.Jump = true
+    if not char then return end
+    
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    -- Determine the height offset (default 10 if none given).
+    local height = 10
+    if args[1] then
+        local customHeight = tonumber(args[1])
+        if customHeight then
+            height = customHeight
         end
-        wait(0.3)
-        char.HumanoidRootPart.Anchored = true
     end
+    
+    -- Temporarily unanchor, shift upward by 'height' studs, then anchor.
+    hrp.Anchored = false
+    hrp.CFrame = hrp.CFrame + Vector3.new(0, height, 0)
+    wait(0.1)
+    hrp.Anchored = true
 end
+
 
 ---------------------------------------------------------------
 -- spot => /spot
