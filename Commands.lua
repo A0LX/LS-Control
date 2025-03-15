@@ -255,7 +255,7 @@ cmds["cdrop"] = function(args, p)
 
     local limitMsg = shortNumber(floorLimit)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-        FireServer("[LS] Conditional Dropping... bag=15k, limit="..limitMsg, "All")
+        FireServer("[LS] Started dropping "..limitMsg, "All")
 
     cDropping = true
     while cDropping do
@@ -266,7 +266,7 @@ cmds["cdrop"] = function(args, p)
         else
             local shortFinal = shortNumber(currentFloor)
             game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-                FireServer("[LS] cdrop done! Floor has $"..shortFinal.." now.", "All")
+                FireServer("[LS] Done dropping "..shortFinal..".", "All")
             cDropping = false
         end
 
