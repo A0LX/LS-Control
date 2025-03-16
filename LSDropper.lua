@@ -1,7 +1,7 @@
 _G.LSDropper = {
     -- Controllers: Enter the UserID's of the players that can control the bots.
     Controllers = {
-        "707293189",
+        "228432957",
     },
     
     -- alts: Put all alt user IDs here
@@ -10,7 +10,7 @@ _G.LSDropper = {
         [2] = 3281293170,
         [3] = 3034352629,
         [4] = 2827160867,
-        -- Add more here if needed, up to [38] etc.
+        [5] = 7178503675,
     },
     
     -- Prefix: Enter the prefix before each command.

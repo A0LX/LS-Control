@@ -7,7 +7,7 @@ local player = game.Players.LocalPlayer
 wallet = false
 dropping = false   -- for /drop
 cDropping = false  -- for /cdrop
-blocking = false
+airlock = false
 
 ---------------------------------------------------------------
 -- 1) HELPER: Parse short-format user input => integer
@@ -553,11 +553,11 @@ end
 cmds["airlock"] = function(args, p)
     local char = player.Character
     if not char then return end
-    
+
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
-    -- Determine the height offset (default 10 if none given).
+    -- Default height is 10
     local height = 10
     if args[1] then
         local customHeight = tonumber(args[1])
@@ -565,12 +565,42 @@ cmds["airlock"] = function(args, p)
             height = customHeight
         end
     end
-    
-    -- Temporarily unanchor, shift upward by 'height' studs, then anchor.
+
+    -- Unanchor, zero velocity, wait a moment
     hrp.Anchored = false
-    hrp.CFrame = hrp.CFrame + Vector3.new(0, height, 0)
-    wait(0.1)
+    hrp.Velocity = Vector3.new(0,0,0)
+    hrp.RotVelocity = Vector3.new(0,0,0)
+    task.wait(0.1)  -- let alt “settle” so we get consistent results
+
+    -- Shift up by 'height' studs from current position, keep same rotation
+    local currentPos = hrp.Position
+    local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
+    hrp.CFrame = CFrame.new(currentPos.X, currentPos.Y + height, currentPos.Z)
+                  * CFrame.Angles(rx, ry, rz)
+
+    -- Finally anchor
     hrp.Anchored = true
+    airlock = true
+
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+        "[LS] Airlocked at "..tostring(height).." studs!",
+        "All"
+    )
+end
+
+cmds["unairlock"] = function(args, p)
+    local char = player.Character
+    if not char then return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp and hrp.Anchored then
+        hrp.Anchored = false
+        airlock = false
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+            "[LS] Unairlocked!",
+            "All"
+        )
+    end
 end
 
 
