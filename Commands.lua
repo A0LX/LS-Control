@@ -1,4 +1,4 @@
--- Commands.lua (Shorter grid-based approach)
+-- Commands.lua (Shorter grid-based approach + debug prints)
 local cmds = {}
 local player = game.Players.LocalPlayer
 
@@ -7,27 +7,37 @@ dropping = false   -- for /drop
 cDropping = false  -- for /cdrop
 airlock = false
 
--- 1) HELPER: Parse short-format user input => integer
+-- 1) HELPER: Parse short-format user input => integer (with debug)
 local function parseShortInput(str)
+    print("parseShortInput => raw input:", str)
     if not str then return nil end
     str = string.lower(str)
+    print("parseShortInput => after lower:", str)
 
     local multiplier = 1
     local lastChar = string.sub(str, -1)
+    print("parseShortInput => lastChar:", lastChar)
+
     if lastChar == "m" then
         multiplier = 1000000
         str = string.sub(str, 1, -2) -- remove 'm'
+        print("parseShortInput => detected 'm', new str:", str, "multiplier:", multiplier)
     elseif lastChar == "k" then
         multiplier = 1000
         str = string.sub(str, 1, -2) -- remove 'k'
+        print("parseShortInput => detected 'k', new str:", str, "multiplier:", multiplier)
     end
 
     local numeric = tonumber(str)
+    print("parseShortInput => numeric:", numeric)
+
     if not numeric then
         return nil
     end
 
-    return math.floor(numeric * multiplier)
+    local finalVal = math.floor(numeric * multiplier)
+    print("parseShortInput => finalVal:", finalVal)
+    return finalVal
 end
 
 -- 2) HELPER: Format large integers in short form
@@ -72,9 +82,9 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
     local row = math.floor((index - 1) / columns)
     local col = (index - 1) % columns
 
-    -- linearly spread out columns left->right (or right->left if xEnd < xStart)
+    -- linearly spread out columns
     local x = xStart + (col * (xEnd - xStart) / (columns - 1))
-    -- linearly spread out rows top->bottom (or bottom->top if zEnd < zStart)
+    -- linearly spread out rows
     local z = zStart + (row * (zEnd - zStart) / (rows - 1))
 
     return CFrame.new(x, y, z)
@@ -102,7 +112,8 @@ local function getKlubPosition(altIndex)
     )
 end
 
--- Roof: now 5 columns x 6 rows (total 30), from start=(-446,39,-304) to end=(-516,39,-267), rotated the OTHER way (90 deg instead of -90)
+-- Roof: 5 columns x 6 rows (total 30)
+-- from start=(-446,39,-304) to end=(-516,39,-267), rotated +90 deg.
 local function getRoofPosition(altIndex)
     local base = getGridPosition(
         altIndex,    -- alt index
@@ -111,7 +122,6 @@ local function getRoofPosition(altIndex)
         -304, -267,  -- zStart, zEnd
         39           -- y
     )
-    -- rotate +90 deg to face the opposite direction
     return base * CFrame.Angles(0, math.rad(90), 0)
 end
 
@@ -204,19 +214,25 @@ cmds["drop"] = function(args, p)
     end
 end
 
--- /cdrop
+-- /cdrop (debug prints for argument parsing & folder check)
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
+    print("[cdrop] => textAmount:", textAmount)
     local numberToAdd = parseShortInput(textAmount)
+    print("[cdrop] => numberToAdd:", numberToAdd)
 
-    if numberToAdd and workspace:FindFirstChild("Drop") then
+    local dropFolder = workspace:FindFirstChild("Drop")
+    print("[cdrop] => dropFolder found?:", dropFolder)
+
+    if numberToAdd and dropFolder then
         dropping = false
         cDropping = true
 
-        local dropFolder = workspace.Drop
         local oldMoney = getMoneyOnFloor()
-
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Started custom drop for +" .. shortNumber(numberToAdd) .. " on floor!", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+            "[LS] Started custom drop for +" .. shortNumber(numberToAdd) .. " on floor!",
+            "All"
+        )
 
         dropBag(15000)
 
@@ -232,11 +248,17 @@ cmds["cdrop"] = function(args, p)
                 cDropping = false
                 dropping = false
                 local finalAmount = shortNumber(getMoneyOnFloor())
-                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Custom drop finished! Floor total: $" .. finalAmount, "All")
+                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+                    "[LS] Custom drop finished! Floor total: $" .. finalAmount,
+                    "All"
+                )
             end
         end)()
     else
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Usage: /cdrop <limit> (e.g. /cdrop 500k)", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+            "[LS] Usage: /cdrop <limit> (e.g. /cdrop 500k)",
+            "All"
+        )
     end
 end
 
