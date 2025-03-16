@@ -221,7 +221,7 @@ cmds["cdrop"] = function(args, p)
     local numberToAdd = parseShortInput(textAmount)
     print("[cdrop] => numberToAdd:", numberToAdd)
 
-    local dropFolder = workspace:FindFirstChild("Drop")
+    local dropFolder = workspace:FindFirstChild("Ignored") and workspace.Ignored:FindFirstChild("Drop")
     print("[cdrop] => dropFolder found?:", dropFolder)
 
     if numberToAdd and dropFolder then
