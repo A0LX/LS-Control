@@ -1,5 +1,5 @@
 ---------------------------------------------------------------
--- Commands.lua (with old cdrop logic, no vault/admin alt spots)
+-- Commands.lua
 ---------------------------------------------------------------
 local cmds = {}
 local player = game.Players.LocalPlayer
@@ -140,7 +140,6 @@ local klubPositions = {
     [30] = CFrame.new(-240,   -6.2, -354),
 }
 
-
 local trainPositions = {
     [1]  = CFrame.new(600, 34, -150),
     [2]  = CFrame.new(601, 34, -150),
@@ -152,7 +151,7 @@ local trainPositions = {
     [8]  = CFrame.new(607, 34, -150),
     [9]  = CFrame.new(608, 34, -150),
     [10] = CFrame.new(609, 34, -150),
-    -- expand to [38] as needed...
+    -- expand as needed...
 }
 
 ---------------------------------------------------------------
@@ -185,7 +184,8 @@ local function getMoneyOnFloor()
 end
 
 ---------------------------------------------------------------
--- Helper to drop a bag of money (always 15k)
+-- Helper to drop a bag of money
+-- (We'll keep it at 15k for consistency with your script)
 ---------------------------------------------------------------
 local function dropBag(amount)
     game.ReplicatedStorage.MainEvent:FireServer("DropMoney", amount)
@@ -229,50 +229,72 @@ cmds["chat"] = function(args, p)
 end
 
 ---------------------------------------------------------------
--- drop => /drop (infinite)
+-- REPLACED: /drop
+-- (Extracted "Drop" logic adapted to your local 'dropping' variable.)
 ---------------------------------------------------------------
 cmds["drop"] = function(args, p)
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-        FireServer("[LS] Started Dropping!", "All")
-    dropping = true
-    repeat
-        dropBag(15000)
-        wait(0.3)
-    until not dropping
+    -- If we're not already dropping, start
+    if not dropping then
+        dropping = true
+        cDropping = false  -- turn off custom dropping if it was on
+
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+            FireServer("[LS] Started Dropping!", "All")
+
+        -- Now drop 15k every 2.5 seconds until we stop.
+        while dropping do
+            dropBag(15000)
+            wait(2.5)
+        end
+    end
 end
 
 ---------------------------------------------------------------
--- cdrop => /cdrop <limitShort>
--- (OLD LOGIC restored per request)
+-- REPLACED: /cdrop
+-- (Extracted "cDrop" logic adapted to your local 'cDropping'.)
 ---------------------------------------------------------------
 cmds["cdrop"] = function(args, p)
-    local floorLimit = parseShortInput(args[1])
-    if not floorLimit then
+    local textAmount = args[1]
+    local numberToAdd = parseShortInput(textAmount)
+
+    if numberToAdd and workspace:FindFirstChild("Drop") then
+        -- Turn off any infinite drop and enable custom dropping
+        dropping = false
+        cDropping = true
+
+        local dropFolder = workspace.Drop
+        local oldMoney = getMoneyOnFloor()
+
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+            FireServer("[LS] Started custom drop for +"
+                       .. shortNumber(numberToAdd) .. " on floor!", "All")
+
+        -- Drop once to begin
+        dropBag(15000)
+
+        coroutine.wrap(function()
+            repeat
+                wait(2.5)
+                dropBag(15000)
+
+                local currentMoney = getMoneyOnFloor()
+            until not dropFolder
+               or not cDropping
+               or (getMoneyOnFloor() >= (oldMoney + numberToAdd))
+
+            if cDropping then
+                cDropping = false
+                dropping = false
+                local finalAmount = shortNumber(getMoneyOnFloor())
+                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+                    FireServer("[LS] Custom drop finished! Floor total: $"
+                               .. finalAmount, "All")
+            end
+        end)()
+    else
+        -- Invalid input or no "Drop" folder found
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
             FireServer("[LS] Usage: /cdrop <limit> (e.g. /cdrop 500k)", "All")
-        return
-    end
-
-    local limitMsg = shortNumber(floorLimit)
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-        FireServer("[LS] Started dropping "..limitMsg, "All")
-
-    cDropping = true
-    while cDropping do
-        local currentFloor = getMoneyOnFloor()
-        if currentFloor < floorLimit then
-            dropBag(15000)   -- always 15k
-            wait(0.3)
-        else
-            local shortFinal = shortNumber(currentFloor)
-            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-                FireServer("[LS] Done dropping "..shortFinal..".", "All")
-            cDropping = false
-        end
-
-        if not cDropping then
-            break
-        end
     end
 end
 
@@ -370,7 +392,7 @@ cmds["tp"] = function(args, p)
 end
 
 ---------------------------------------------------------------
--- tpf => same as /tp but then "Anchors"
+-- tpf => /tpf
 ---------------------------------------------------------------
 cmds["tpf"] = function(args, p)
     if (not args[1] or args[1] == "") then
@@ -570,9 +592,9 @@ cmds["airlock"] = function(args, p)
     hrp.Anchored = false
     hrp.Velocity = Vector3.new(0,0,0)
     hrp.RotVelocity = Vector3.new(0,0,0)
-    task.wait(0.1)  -- let alt “settle” so we get consistent results
+    task.wait(0.1)
 
-    -- Shift up by 'height' studs from current position, keep same rotation
+    -- Shift up by 'height' studs
     local currentPos = hrp.Position
     local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
     hrp.CFrame = CFrame.new(currentPos.X, currentPos.Y + height, currentPos.Z)
@@ -602,7 +624,6 @@ cmds["unairlock"] = function(args, p)
         )
     end
 end
-
 
 ---------------------------------------------------------------
 -- spot => /spot
@@ -639,7 +660,7 @@ cmds["whoami"] = function(args, p)
 end
 
 ---------------------------------------------------------------
--- bring => /bring <partialName> => Teleport target to your alt
+-- bring => /bring <partialName>
 ---------------------------------------------------------------
 cmds["bring"] = function(args, p)
     if not args[1] or args[1] == "" then
