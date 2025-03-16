@@ -6,11 +6,11 @@ _G.LSDropper = {
     
     -- alts: Put all alt user IDs here
     alts = {
-        [1] = 2939174150,
-        [2] = 3281293170,
-        [3] = 3034352629,
-        [4] = 2827160867,
-        [5] = 7178503675,
+        2939174150,
+        3281293170,
+        3034352629,
+        2827160867,
+        7178503675,
     },
     
     -- Prefix: Enter the prefix before each command.
