@@ -1,5 +1,5 @@
 _G.LSDropper = {
-    -- Controllers: Enter the UserID's of the players that can control the bots.
+    -- Controllers: Enter the user IDs (or names) allowed to control the bots
     Controllers = {
         "228432957",
     },
