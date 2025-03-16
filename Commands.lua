@@ -112,7 +112,7 @@ local function getRoofPosition(altIndex)
         39           -- y
     )
     -- Now rotate character 90 deg to the right around Y
-    return base * CFrame.Angles(0, math.rad(90), 0)
+    return base * CFrame.Angles(0, math.rad(270), 0)
 end
 
 -- We'll keep train positions as is (small set)
