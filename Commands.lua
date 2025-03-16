@@ -106,7 +106,7 @@ end
 local function getRoofPosition(altIndex)
     local base = getGridPosition(
         altIndex,    -- alt index
-        4, 3,        -- columns, rows
+        5, 6,        -- columns, rows
         -446, -516,  -- xStart, xEnd
         -304, -267,  -- zStart, zEnd
         39           -- y
