@@ -102,17 +102,17 @@ local function getKlubPosition(altIndex)
     )
 end
 
--- Roof: define a function with 4 columns x 3 rows, from start=(-446,39,-304) to end=(-516,39,-267), rotated 90 deg right.
+-- Roof: now 5 columns x 6 rows (total 30), from start=(-446,39,-304) to end=(-516,39,-267), rotated the OTHER way (90 deg instead of -90)
 local function getRoofPosition(altIndex)
     local base = getGridPosition(
         altIndex,    -- alt index
-        5, 6,        -- columns, rows
+        5, 6,        -- columns, rows => 30 total
         -446, -516,  -- xStart, xEnd
         -304, -267,  -- zStart, zEnd
         39           -- y
     )
-    -- Now rotate character 90 deg to the right around Y
-    return base * CFrame.Angles(0, math.rad(-90), 0)
+    -- rotate +90 deg to face the opposite direction
+    return base * CFrame.Angles(0, math.rad(90), 0)
 end
 
 -- We'll keep train positions as is (small set)
