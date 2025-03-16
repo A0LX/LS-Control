@@ -72,9 +72,9 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
     local row = math.floor((index - 1) / columns)
     local col = (index - 1) % columns
 
-    -- linearly spread out columns left->right
+    -- linearly spread out columns left->right (or right->left if xEnd < xStart)
     local x = xStart + (col * (xEnd - xStart) / (columns - 1))
-    -- linearly spread out rows top->bottom
+    -- linearly spread out rows top->bottom (or bottom->top if zEnd < zStart)
     local z = zStart + (row * (zEnd - zStart) / (rows - 1))
 
     return CFrame.new(x, y, z)
@@ -100,6 +100,19 @@ local function getKlubPosition(altIndex)
         -404, -354,       -- zStart, zEnd
         -6.2              -- y
     )
+end
+
+-- Roof: define a function with 4 columns x 3 rows, from start=(-446,39,-304) to end=(-516,39,-267), rotated 90 deg right.
+local function getRoofPosition(altIndex)
+    local base = getGridPosition(
+        altIndex,    -- alt index
+        4, 3,        -- columns, rows
+        -446, -516,  -- xStart, xEnd
+        -304, -267,  -- zStart, zEnd
+        39           -- y
+    )
+    -- Now rotate character 90 deg to the right around Y
+    return base * CFrame.Angles(0, math.rad(90), 0)
 end
 
 -- We'll keep train positions as is (small set)
@@ -260,34 +273,8 @@ local function teleportToLocation(loc, anchorAfter)
         else
             hrp.CFrame = trainPositions[1]
         end
-    elseif loc == "safezone1" then
-        hrp.CFrame = CFrame.new(
-            -117.270287, -58.7000618, 146.536087,
-             0.999873519, 5.21876942e-08, -0.0159031227,
-            -5.22713037e-08, 1, -4.84179008e-09,
-             0.0159031227, 5.67245495e-09, 0.999873519
-        )
-    elseif loc == "safezone2" then
-        hrp.CFrame = CFrame.new(
-            207.48085, 38.25, 200014.953,
-            0.507315397, 0, -0.861760437,
-            0, 1, 0,
-            0.861760437, 0, 0.507315397
-        )
-    elseif loc == "station" then
-        hrp.CFrame = CFrame.new(
-            591.680725, 49.0000458, -256.818298,
-           -0.0874911696, -3.41755495e-08, -0.996165276,
-            1.23318324e-08, 1, -3.53901868e-08,
-            0.996165276, -1.53808717e-08, -0.0874911696
-        )
-    elseif loc == "taco" then
-        hrp.CFrame = CFrame.new(
-            583.931641, 51.061409, -476.954193,
-           -0.999745369, 1.49123665e-08, -0.0225663595,
-            1.44838328e-08, 1, 1.91533687e-08,
-            0.0225663595, 1.88216429e-08, -0.999745369
-        )
+    elseif loc == "roof" then
+        hrp.CFrame = getRoofPosition(altIdx)
     end
 
     if anchorAfter then
