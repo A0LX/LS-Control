@@ -1,9 +1,10 @@
 ---------------------------------------------------------------
--- Commands.lua
+-- Commands.lua (Full Code with Alt Positions + Slash-Fix)
 ---------------------------------------------------------------
 local cmds = {}
 local player = game.Players.LocalPlayer
 
+-- State flags
 wallet = false
 dropping = false   -- for /drop
 cDropping = false  -- for /cdrop
@@ -62,10 +63,13 @@ local function shortNumber(n)
 end
 
 ---------------------------------------------------------------
--- 3) HELPER: Figure out which alt index this local player is.
+-- 3) HELPER: Which alt index is this local player?
 ---------------------------------------------------------------
 local function getAltIndex()
     local userId = player.UserId
+    if not _G.LSDropper or not _G.LSDropper.alts then 
+        return nil 
+    end
     for i, altUserId in pairs(_G.LSDropper.alts) do
         if altUserId == userId then
             return i
@@ -74,6 +78,9 @@ local function getAltIndex()
     return nil
 end
 
+---------------------------------------------------------------
+-- Position tables (30 positions each)
+---------------------------------------------------------------
 local bankPositions = {
     [1]  = CFrame.new(-390,   21, -338),
     [2]  = CFrame.new(-383.8, 21, -338),
@@ -140,19 +147,16 @@ local klubPositions = {
     [30] = CFrame.new(-240,   -6.2, -354),
 }
 
-local trainPositions = {
-    [1]  = CFrame.new(600, 34, -150),
-    [2]  = CFrame.new(601, 34, -150),
-    [3]  = CFrame.new(602, 34, -150),
-    [4]  = CFrame.new(603, 34, -150),
-    [5]  = CFrame.new(604, 34, -150),
-    [6]  = CFrame.new(605, 34, -150),
-    [7]  = CFrame.new(606, 34, -150),
-    [8]  = CFrame.new(607, 34, -150),
-    [9]  = CFrame.new(608, 34, -150),
-    [10] = CFrame.new(609, 34, -150),
-    -- expand as needed...
-}
+-- For train, let's just create 30 positions in a row for demonstration
+local trainPositions = {}
+do
+    local startX, startY, startZ = 600, 34, -150
+    -- We'll place them 2 studs apart in X for 30 alts
+    for i = 1, 30 do
+        local offset = (i-1)*2
+        trainPositions[i] = CFrame.new(startX + offset, startY, startZ)
+    end
+end
 
 ---------------------------------------------------------------
 -- Summation of money on the floor
@@ -185,14 +189,13 @@ end
 
 ---------------------------------------------------------------
 -- Helper to drop a bag of money
--- (We'll keep it at 15k for consistency with your script)
 ---------------------------------------------------------------
 local function dropBag(amount)
     game.ReplicatedStorage.MainEvent:FireServer("DropMoney", amount)
 end
 
 ---------------------------------------------------------------
--- re -> Respawn
+-- re => /re => Respawn
 ---------------------------------------------------------------
 cmds["re"] = function(args, p)
     local origin_spot = player.Character.HumanoidRootPart.CFrame
@@ -202,46 +205,39 @@ cmds["re"] = function(args, p)
 end
 
 ---------------------------------------------------------------
--- freeze -> Toggles anchored
+-- freeze => Toggles anchored
 ---------------------------------------------------------------
 cmds["freeze"] = function(args, p)
-    player.Character.HumanoidRootPart.Anchored = 
-        not player.Character.HumanoidRootPart.Anchored
-end
-
----------------------------------------------------------------
--- chat -> /chat [message...]
----------------------------------------------------------------
-cmds["chat"] = function(args, p)
-    if (args[1] == "" or args[1] == nil) then
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-            FireServer("LS ON TOP!", "All")
-    else
-        local str = ""
-        for i = 1, 50 do
-            if (args[i]) then
-                str = str .. " " .. args[i]
-            end
-        end
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-            FireServer(str, "All")
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        hrp.Anchored = not hrp.Anchored
     end
 end
 
 ---------------------------------------------------------------
--- REPLACED: /drop
--- (Extracted "Drop" logic adapted to your local 'dropping' variable.)
+-- chat => /chat [message...]
+---------------------------------------------------------------
+cmds["chat"] = function(args, p)
+    if not args[1] then
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+            FireServer("LS ON TOP!", "All")
+        return
+    end
+    local str = table.concat(args, " ")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+        FireServer(str, "All")
+end
+
+---------------------------------------------------------------
+-- /drop => infinite drop of 15k every 2.5s until /stop
 ---------------------------------------------------------------
 cmds["drop"] = function(args, p)
-    -- If we're not already dropping, start
     if not dropping then
         dropping = true
-        cDropping = false  -- turn off custom dropping if it was on
-
+        cDropping = false -- ensure custom dropping is off
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
             FireServer("[LS] Started Dropping!", "All")
-
-        -- Now drop 15k every 2.5 seconds until we stop.
+        
         while dropping do
             dropBag(15000)
             wait(2.5)
@@ -250,56 +246,55 @@ cmds["drop"] = function(args, p)
 end
 
 ---------------------------------------------------------------
--- REPLACED: /cdrop
--- (Extracted "cDrop" logic adapted to your local 'cDropping'.)
+-- /cdrop <limit> => custom drop until floor total increases by <limit>
 ---------------------------------------------------------------
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
-    local numberToAdd = parseShortInput(textAmount)
-
-    if numberToAdd and workspace:FindFirstChild("Drop") then
-        -- Turn off any infinite drop and enable custom dropping
-        dropping = false
-        cDropping = true
-
-        local dropFolder = workspace.Drop
-        local oldMoney = getMoneyOnFloor()
-
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-            FireServer("[LS] Started custom drop for +"
-                       .. shortNumber(numberToAdd) .. " on floor!", "All")
-
-        -- Drop once to begin
-        dropBag(15000)
-
-        coroutine.wrap(function()
-            repeat
-                wait(2.5)
-                dropBag(15000)
-
-                local currentMoney = getMoneyOnFloor()
-            until not dropFolder
-               or not cDropping
-               or (getMoneyOnFloor() >= (oldMoney + numberToAdd))
-
-            if cDropping then
-                cDropping = false
-                dropping = false
-                local finalAmount = shortNumber(getMoneyOnFloor())
-                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-                    FireServer("[LS] Custom drop finished! Floor total: $"
-                               .. finalAmount, "All")
-            end
-        end)()
-    else
-        -- Invalid input or no "Drop" folder found
+    if not textAmount then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
             FireServer("[LS] Usage: /cdrop <limit> (e.g. /cdrop 500k)", "All")
+        return
     end
+
+    local numberToAdd = parseShortInput(textAmount)
+    if not numberToAdd or not workspace:FindFirstChild("Drop") then
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+            FireServer("[LS] Usage: /cdrop <limit> (e.g. /cdrop 500k)", "All")
+        return
+    end
+    
+    -- Turn off infinite drop if it was on
+    dropping = false
+    cDropping = true
+
+    local oldMoney = getMoneyOnFloor()
+    local shortLimit = shortNumber(numberToAdd)
+
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+        FireServer("[LS] Started custom drop for +".. shortLimit .." on floor!", "All")
+
+    -- Drop once to begin
+    dropBag(15000)
+
+    coroutine.wrap(function()
+        repeat
+            wait(2.5)
+            dropBag(15000)
+        until not cDropping
+           or getMoneyOnFloor() >= (oldMoney + numberToAdd)
+
+        if cDropping then
+            cDropping = false
+            dropping = false
+            local finalAmount = shortNumber(getMoneyOnFloor())
+            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+                FireServer("[LS] Custom drop finished! Floor total: $".. finalAmount, "All")
+        end
+    end)()
 end
 
 ---------------------------------------------------------------
--- dropped => /dropped
+-- dropped => /dropped => show money on floor
 ---------------------------------------------------------------
 cmds["dropped"] = function(args, p)
     local floorTotal = getMoneyOnFloor()
@@ -323,169 +318,125 @@ end
 -- tp => /tp [bank, klub, train, safezone1, safezone2, station, taco]
 ---------------------------------------------------------------
 cmds["tp"] = function(args, p)
-    if (not args[1] or args[1] == "") then
+    local loc = string.lower(args[1] or "")
+    if loc == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
             FireServer("[LS] Please input place to teleport to.", "All")
         return
     end
 
-    local loc = string.lower(args[1])
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
         FireServer("[LS] Teleporting to '" .. loc .. "'!", "All")
 
-    player.Character.HumanoidRootPart.Anchored = false
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    hrp.Anchored = false
+
     local altIdx = getAltIndex() or 1
 
     if loc == "bank" then
-        if bankPositions[altIdx] then
-            player.Character.HumanoidRootPart.CFrame = bankPositions[altIdx]
-        else
-            player.Character.HumanoidRootPart.CFrame = bankPositions[1]
-        end
-
+        hrp.CFrame = bankPositions[altIdx] or bankPositions[1]
     elseif loc == "klub" then
-        if klubPositions[altIdx] then
-            player.Character.HumanoidRootPart.CFrame = klubPositions[altIdx]
-        else
-            player.Character.HumanoidRootPart.CFrame = klubPositions[1]
-        end
-
+        hrp.CFrame = klubPositions[altIdx] or klubPositions[1]
     elseif loc == "train" then
-        if trainPositions[altIdx] then
-            player.Character.HumanoidRootPart.CFrame = trainPositions[altIdx]
-        else
-            player.Character.HumanoidRootPart.CFrame = trainPositions[1]
-        end
-
+        hrp.CFrame = trainPositions[altIdx] or trainPositions[1]
     elseif loc == "safezone1" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            -117.270287, -58.7000618, 146.536087,
-             0.999873519, 5.21876942e-08, -0.0159031227,
-            -5.22713037e-08, 1, -4.84179008e-09,
-             0.0159031227, 5.67245495e-09, 0.999873519
-        )
-
+        hrp.CFrame = CFrame.new(-117.270287, -58.7000618, 146.536087,
+                                0.999873519, 5.21876942e-08, -0.0159031227,
+                               -5.22713037e-08, 1, -4.84179008e-09,
+                                0.0159031227, 5.67245495e-09, 0.999873519)
     elseif loc == "safezone2" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            207.48085, 38.25, 200014.953,
-            0.507315397, 0, -0.861760437,
-            0, 1, 0,
-            0.861760437, 0, 0.507315397
-        )
-
+        hrp.CFrame = CFrame.new(207.48085, 38.25, 200014.953,
+                                0.507315397, 0, -0.861760437,
+                                0, 1, 0,
+                                0.861760437, 0, 0.507315397)
     elseif loc == "station" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            591.680725, 49.0000458, -256.818298,
-           -0.0874911696, -3.41755495e-08, -0.996165276,
-            1.23318324e-08, 1, -3.53901868e-08,
-            0.996165276, -1.53808717e-08, -0.0874911696
-        )
-
+        hrp.CFrame = CFrame.new(591.680725, 49.0000458, -256.818298,
+                               -0.0874911696, -3.41755495e-08, -0.996165276,
+                                1.23318324e-08, 1, -3.53901868e-08,
+                                0.996165276, -1.53808717e-08, -0.0874911696)
     elseif loc == "taco" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            583.931641, 51.061409, -476.954193,
-           -0.999745369, 1.49123665e-08, -0.0225663595,
-            1.44838328e-08, 1, 1.91533687e-08,
-            0.0225663595, 1.88216429e-08, -0.999745369
-        )
+        hrp.CFrame = CFrame.new(583.931641, 51.061409, -476.954193,
+                               -0.999745369, 1.49123665e-08, -0.0225663595,
+                                1.44838328e-08, 1, 1.91533687e-08,
+                                0.0225663595, 1.88216429e-08, -0.999745369)
     end
 end
 
 ---------------------------------------------------------------
--- tpf => /tpf
+-- tpf => /tpf (same as /tp but anchor after)
 ---------------------------------------------------------------
 cmds["tpf"] = function(args, p)
-    if (not args[1] or args[1] == "") then
+    local loc = string.lower(args[1] or "")
+    if loc == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
             FireServer("[LS] Please input place to teleport to.", "All")
         return
     end
 
-    local loc = string.lower(args[1])
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
         FireServer("[LS] Teleporting to '" .. loc .. "'!", "All")
 
-    player.Character.HumanoidRootPart.Anchored = false
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    hrp.Anchored = false
+
     local altIdx = getAltIndex() or 1
 
     if loc == "bank" then
-        if bankPositions[altIdx] then
-            player.Character.HumanoidRootPart.CFrame = bankPositions[altIdx]
-        else
-            player.Character.HumanoidRootPart.CFrame = bankPositions[1]
-        end
-
+        hrp.CFrame = bankPositions[altIdx] or bankPositions[1]
     elseif loc == "klub" then
-        if klubPositions[altIdx] then
-            player.Character.HumanoidRootPart.CFrame = klubPositions[altIdx]
-        else
-            player.Character.HumanoidRootPart.CFrame = klubPositions[1]
-        end
-
+        hrp.CFrame = klubPositions[altIdx] or klubPositions[1]
     elseif loc == "train" then
-        if trainPositions[altIdx] then
-            player.Character.HumanoidRootPart.CFrame = trainPositions[altIdx]
-        else
-            player.Character.HumanoidRootPart.CFrame = trainPositions[1]
-        end
-
+        hrp.CFrame = trainPositions[altIdx] or trainPositions[1]
     elseif loc == "safezone1" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            -117.270287, -58.7000618, 146.536087,
-             0.999873519, 5.21876942e-08, -0.0159031227,
-            -5.22713037e-08, 1, -4.84179008e-09,
-             0.0159031227, 5.67245495e-09, 0.999873519
-        )
-
+        hrp.CFrame = CFrame.new(-117.270287, -58.7000618, 146.536087,
+                                0.999873519, 5.21876942e-08, -0.0159031227,
+                               -5.22713037e-08, 1, -4.84179008e-09,
+                                0.0159031227, 5.67245495e-09, 0.999873519)
     elseif loc == "safezone2" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            207.48085, 38.25, 200014.953,
-            0.507315397, 0, -0.861760437,
-            0, 1, 0,
-            0.861760437, 0, 0.507315397
-        )
-
+        hrp.CFrame = CFrame.new(207.48085, 38.25, 200014.953,
+                                0.507315397, 0, -0.861760437,
+                                0, 1, 0,
+                                0.861760437, 0, 0.507315397)
     elseif loc == "station" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            591.680725, 49.0000458, -256.818298,
-           -0.0874911696, -3.41755495e-08, -0.996165276,
-            1.23318324e-08, 1, -3.53901868e-08,
-            0.996165276, -1.53808717e-08, -0.0874911696
-        )
-
+        hrp.CFrame = CFrame.new(591.680725, 49.0000458, -256.818298,
+                               -0.0874911696, -3.41755495e-08, -0.996165276,
+                                1.23318324e-08, 1, -3.53901868e-08,
+                                0.996165276, -1.53808717e-08, -0.0874911696)
     elseif loc == "taco" then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(
-            583.931641, 51.061409, -476.954193,
-           -0.999745369, 1.49123665e-08, -0.0225663595,
-            1.44838328e-08, 1, 1.91533687e-08,
-            0.0225663595, 1.88216429e-08, -0.999745369
-        )
+        hrp.CFrame = CFrame.new(583.931641, 51.061409, -476.954193,
+                               -0.999745369, 1.49123665e-08, -0.0225663595,
+                                1.44838328e-08, 1, 1.91533687e-08,
+                                0.0225663595, 1.88216429e-08, -0.999745369)
     end
 
     wait(0.3)
-    player.Character.HumanoidRootPart.Anchored = true
+    hrp.Anchored = true
 end
 
 ---------------------------------------------------------------
 -- goto => /goto [playerName]
 ---------------------------------------------------------------
 cmds["goto"] = function(args, p)
-    if (not args[1] or args[1] == "") then
+    local targetName = args[1] or ""
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    hrp.Anchored = false
+
+    if targetName == "" then
         -- goto p => local alt goto the command sender
-        player.Character.HumanoidRootPart.Anchored = false
         local target = game.Workspace:FindFirstChild(p.Name)
         if target and target:FindFirstChild("HumanoidRootPart") then
-            player.Character.HumanoidRootPart.CFrame =
-                target.HumanoidRootPart.CFrame
+            hrp.CFrame = target.HumanoidRootPart.CFrame
         end
     else
-        local target = game.Workspace:FindFirstChild(args[1])
+        local target = game.Workspace:FindFirstChild(targetName)
         if not target or not target:FindFirstChild("HumanoidRootPart") then
             game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
                 FireServer("[LS] Character doesn't exist.", "All")
         else
-            player.Character.HumanoidRootPart.CFrame =
-                target.HumanoidRootPart.CFrame
+            hrp.CFrame = target.HumanoidRootPart.CFrame
         end
     end
 end
@@ -502,7 +453,7 @@ end
 -- wallet => toggles wallet equip/unequip
 ---------------------------------------------------------------
 cmds["wallet"] = function(args, p)
-    if (wallet == false) then
+    if not wallet then
         local backpack = player.Backpack
         if backpack:FindFirstChild("Wallet") then
             player.Character.Humanoid:EquipTool(backpack.Wallet)
@@ -517,7 +468,7 @@ cmds["wallet"] = function(args, p)
 end
 
 ---------------------------------------------------------------
--- AIRWALK code (unchanged)
+-- AIRWALK code
 ---------------------------------------------------------------
 local RunService = game:GetService("RunService")
 
@@ -588,19 +539,16 @@ cmds["airlock"] = function(args, p)
         end
     end
 
-    -- Unanchor, zero velocity, wait a moment
     hrp.Anchored = false
     hrp.Velocity = Vector3.new(0,0,0)
     hrp.RotVelocity = Vector3.new(0,0,0)
     task.wait(0.1)
 
-    -- Shift up by 'height' studs
     local currentPos = hrp.Position
     local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
     hrp.CFrame = CFrame.new(currentPos.X, currentPos.Y + height, currentPos.Z)
                   * CFrame.Angles(rx, ry, rz)
 
-    -- Finally anchor
     hrp.Anchored = true
     airlock = true
 
@@ -631,13 +579,15 @@ end
 cmds["spot"] = function(args, p)
     if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
         local controllerRoot = p.Character.HumanoidRootPart
-        player.Character.HumanoidRootPart.Anchored = false
-        local targetCFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
-        player.Character.HumanoidRootPart.CFrame = targetCFrame
-        wait(0.3)
-        player.Character.HumanoidRootPart.Anchored = true
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
-            FireServer("[LS] Spot!", "All")
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.Anchored = false
+            hrp.CFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
+            wait(0.3)
+            hrp.Anchored = true
+            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:
+                FireServer("[LS] Spot!", "All")
+        end
     else
         warn("Controller's HumanoidRootPart not found; cannot execute spot command.")
     end
@@ -670,7 +620,7 @@ cmds["bring"] = function(args, p)
     end
 
     local partial = string.lower(args[1])
-    local foundPlayer = nil
+    local foundPlayer
     for _,pl in pairs(game.Players:GetPlayers()) do
         if string.sub(string.lower(pl.Name),1,#partial) == partial then
             foundPlayer = pl
@@ -695,3 +645,26 @@ end
 -- Expose to _G
 ---------------------------------------------------------------
 _G.LSCommands = cmds
+
+----------------------------------------------------------------
+--  Chat hook: remove leading slash, dispatch to our commands
+----------------------------------------------------------------
+game.ReplicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(data)
+    local plrName = data.FromSpeaker
+    local msg = data.Message
+    local speaker = game.Players:FindFirstChild(plrName)
+    if not speaker then return end
+
+    -- If there's a leading slash, remove it => "cdrop 500k", etc.
+    if string.sub(msg, 1, 1) == "/" then
+        msg = string.sub(msg, 2)
+    end
+
+    local split = string.split(msg, " ")  -- e.g. {"cdrop", "500k"}
+    local commandName = string.lower(split[1] or "")
+    table.remove(split, 1)  -- remove command => split now = {"500k"} etc.
+
+    if _G.LSCommands[commandName] then
+        _G.LSCommands[commandName](split, speaker)
+    end
+end)
