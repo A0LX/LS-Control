@@ -205,7 +205,7 @@ cmds["drop"] = function(args, p)
         dropping = true
         cDropping = false  -- turn off custom dropping if it was on
 
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Started Dropping!", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started Dropping!", "All")
 
         while dropping do
             dropBag(15000)
@@ -230,7 +230,7 @@ cmds["cdrop"] = function(args, p)
 
         local oldMoney = getMoneyOnFloor()
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "[LS] Started custom drop for +" .. shortNumber(numberToAdd) .. " on floor!",
+            "Started cdrop! $" .. shortNumber(numberToAdd) .. ,
             "All"
         )
 
@@ -249,14 +249,14 @@ cmds["cdrop"] = function(args, p)
                 dropping = false
                 local finalAmount = shortNumber(getMoneyOnFloor())
                 game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-                    "[LS] Custom drop finished! Floor total: $" .. finalAmount,
+                    "Cdrop done! $" .. finalAmount,
                     "All"
                 )
             end
         end)()
     else
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "[LS] Usage: /cdrop <limit> (e.g. /cdrop 500k)",
+            "Usage: /cdrop <limit> (e.g. /cdrop 500k)",
             "All"
         )
     end
@@ -266,7 +266,7 @@ end
 cmds["dropped"] = function(args, p)
     local floorTotal = getMoneyOnFloor()
     local shortValue = shortNumber(floorTotal)
-    local msg = "[LS] Current floor total: $" .. shortValue
+    local msg = "Current floor total: $" .. shortValue
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
 end
 
@@ -274,14 +274,14 @@ end
 cmds["stop"] = function(args, p)
     dropping = false
     cDropping = false
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Stopped dropping!", "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping!", "All")
 end
 
 -- We'll unify tp logic
 local function teleportToLocation(loc, anchorAfter)
     local altIdx = getAltIndex() or 1
     local hrp = player.Character.HumanoidRootPart
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Teleporting to '" .. loc .. "'!", "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer( .. loc .. "'!", "All")
 
     hrp.Anchored = false
 
@@ -308,7 +308,7 @@ end
 -- /tp => no anchor after
 cmds["tp"] = function(args, p)
     if (not args[1] or args[1] == "") then
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Please input place to teleport to.", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Please input a valid location.", "All")
         return
     end
     teleportToLocation(string.lower(args[1]), false)
@@ -317,7 +317,7 @@ end
 -- /tpf => anchor after
 cmds["tpf"] = function(args, p)
     if (not args[1] or args[1] == "") then
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Please input place to teleport to.", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Please input place to teleport to.", "All")
         return
     end
     teleportToLocation(string.lower(args[1]), true)
@@ -338,7 +338,7 @@ cmds["goto"] = function(args, p)
     else
         local target = game.Workspace:FindFirstChild(args[1])
         if not target or not target:FindFirstChild("HumanoidRootPart") then
-            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Character doesn't exist.", "All")
+            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Character doesn't exist.", "All")
         else
             hrp.CFrame = target.HumanoidRootPart.CFrame
         end
@@ -444,7 +444,7 @@ cmds["airlock"] = function(args, p)
     airlock = true
 
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-        "[LS] Airlocked at "..tostring(height).." studs!",
+        "Airlocked",
         "All"
     )
 end
@@ -458,7 +458,7 @@ cmds["unairlock"] = function(args, p)
         hrp.Anchored = false
         airlock = false
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "[LS] Unairlocked!",
+            "Unairlocked!",
             "All"
         )
     end
@@ -473,7 +473,7 @@ cmds["spot"] = function(args, p)
         player.Character.HumanoidRootPart.CFrame = targetCFrame
         wait(0.3)
         player.Character.HumanoidRootPart.Anchored = true
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Spot!", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Spot!", "All")
     else
         warn("Controller's HumanoidRootPart not found; cannot execute spot command.")
     end
@@ -494,7 +494,7 @@ end
 -- /bring => /bring <partialName>
 cmds["bring"] = function(args, p)
     if not args[1] or args[1] == "" then
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Usage: /bring <playerName>", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /bring <playerName>", "All")
         return
     end
 
@@ -511,10 +511,10 @@ cmds["bring"] = function(args, p)
         local altHRP = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
         if altHRP then
             foundPlayer.Character.HumanoidRootPart.CFrame = altHRP.CFrame + Vector3.new(0,2,0)
-            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Brought "..foundPlayer.Name.." to me!", "All")
+            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Brought "..foundPlayer.Name.." to me!", "All")
         end
     else
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("[LS] Could not find or bring target "..args[1], "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Could not find or bring target "..args[1], "All")
     end
 end
 
