@@ -230,7 +230,7 @@ cmds["cdrop"] = function(args, p)
 
         local oldMoney = getMoneyOnFloor()
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "Started cdrop! $" .. shortNumber(numberToAdd) .. ,
+            "Started cdrop! $" .. shortNumber(numberToAdd),
             "All"
         )
 
@@ -277,11 +277,10 @@ cmds["stop"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping!", "All")
 end
 
--- We'll unify tp logic
 local function teleportToLocation(loc, anchorAfter)
     local altIdx = getAltIndex() or 1
     local hrp = player.Character.HumanoidRootPart
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer( .. loc .. "'!", "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(loc .. "'!", "All")
 
     hrp.Anchored = false
 
