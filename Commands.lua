@@ -142,7 +142,7 @@ local trainPositions = {
 -- Summation of money on the floor
 local function getMoneyOnFloor()
     local total = 0
-    local dropFolder = workspace:FindFirstChild("Drop")
+    local dropFolder = workspace:FindFirstChild("Ignored") and workspace.Ignored:FindFirstChild("Drop")
     if not dropFolder then
         return 0
     end
