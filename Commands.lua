@@ -469,7 +469,7 @@ cmds["line"] = function(args, p)
     end
     local controllerRoot = p.Character.HumanoidRootPart
     -- Base formation point is 2 studs behind the controller
-    local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, -2)
+    local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, 2)
     
     local altList = _G.LSDropper.alts or {}
     local total = #altList
@@ -485,7 +485,9 @@ cmds["line"] = function(args, p)
     local hrp = player.Character.HumanoidRootPart
     -- Teleport while matching controller’s forward direction
     hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line formation", "All")
+    wait(0.3)
+    player.Character.HumanoidRootPart.Anchored = true
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line!", "All")
 end
 
 -- /circle: Arrange alts in a circle around the controller.
@@ -512,7 +514,9 @@ cmds["circle"] = function(args, p)
 
     local hrp = player.Character.HumanoidRootPart
     hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle formation", "All")
+    wait(0.3)
+    player.Character.HumanoidRootPart.Anchored = true
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle!", "All")
 end
 
 -- Expose commands to _G
