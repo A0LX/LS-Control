@@ -503,8 +503,8 @@ cmds["circle"] = function(args, p)
     local myIndex = getAltIndex()
     if not myIndex then return end
 
-    -- Divide 365° among all alts.
-    local anglePerAlt = math.rad(365 / total)
+    -- Divide 360° among all alts.
+    local anglePerAlt = math.rad(360 / total)
     local myAngle = (myIndex - 1) * anglePerAlt
 
     -- Rotate controller's forward vector by myAngle around Y.
