@@ -354,12 +354,12 @@ end
 cmds["wallet"] = function(args, p)
     if (wallet == false) then
         local backpack = player.Backpack
-        if backpack:FindFirstChild("Wallet") then
-            player.Character.Humanoid:EquipTool(backpack.Wallet)
+        if backpack:FindFirstChild("[Wallet]") then
+            player.Character.Humanoid:EquipTool(backpack.[Wallet])
         end
         wallet = true
     else
-        if player.Character:FindFirstChild("Wallet") then
+        if player.Character:FindFirstChild("[Wallet]") then
             player.Character.Humanoid:UnequipTools()
         end
         wallet = false
