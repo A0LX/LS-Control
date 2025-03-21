@@ -492,6 +492,7 @@ cmds["line"] = function(args, p)
 end
 
 -- /circle: Arrange alts in a circle around the controller.
+-- This version sets the alt's CFrame so that it faces the controller.
 cmds["circle"] = function(args, p)
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
@@ -515,7 +516,8 @@ cmds["circle"] = function(args, p)
     local targetPos = basePos + rotatedDir * radius
 
     local hrp = player.Character.HumanoidRootPart
-    hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
+    -- Set CFrame so that the alt faces the controller's position (basePos)
+    hrp.CFrame = CFrame.new(targetPos, basePos)
     wait(0.3)
     player.Character.HumanoidRootPart.Anchored = true
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle!", "All")
