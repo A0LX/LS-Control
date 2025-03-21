@@ -89,15 +89,16 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
     return CFrame.new(x, y, z)
 end
 
--- Bank: 6 columns x 5 rows
+-- Bank: 5 columns x 6 rows
 local function getBankPosition(altIndex)
     return getGridPosition(
         altIndex,         -- index
-        6, 5,            -- columns, rows
+        5, 6,            -- columns, rows
         -390, -359,      -- xStart, xEnd
         -338, -306,      -- zStart, zEnd
         21               -- y
     )
+    return base * CFrame.Angles(0, math.rad(0), 0)
 end
 
 -- Klub: 5 columns x 6 rows
@@ -109,6 +110,7 @@ local function getKlubPosition(altIndex)
         -404, -354,       -- zStart, zEnd
         -6.2              -- y
     )
+    return base * CFrame.Angles(0, math.rad(0), 0)
 end
 
 -- Roof: 5 columns x 6 rows (total 30)
@@ -121,7 +123,7 @@ local function getRoofPosition(altIndex)
         -304, -267,  -- zStart, zEnd
         39           -- y
     )
-    return base * CFrame.Angles(0, math.rad(90), 0)
+    return base * CFrame.Angles(0, math.rad(270), 0)
 end
 
 -- We'll keep train positions as is (small set)
