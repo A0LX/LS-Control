@@ -432,7 +432,7 @@ cmds["airlock"] = function(args, p)
     hrp.Anchored = false
     hrp.Velocity = Vector3.new(0,0,0)
     hrp.RotVelocity = Vector3.new(0,0,0)
-    task.wait(0.1)
+    task.wait(0.3)
 
     local currentPos = hrp.Position
     local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
