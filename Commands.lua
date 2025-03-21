@@ -421,6 +421,7 @@ cmds["airlock"] = function(args, p)
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
+    -- Set target height (default is 10 studs, or use the custom value provided)
     local height = 10
     if args[1] then
         local customHeight = tonumber(args[1])
@@ -429,22 +430,30 @@ cmds["airlock"] = function(args, p)
         end
     end
 
+    -- Unanchor and reset motion to prepare for repositioning
     hrp.Anchored = false
-    hrp.Velocity = Vector3.new(0,0,0)
-    hrp.RotVelocity = Vector3.new(0,0,0)
+    hrp.Velocity = Vector3.new(0, 0, 0)
+    hrp.RotVelocity = Vector3.new(0, 0, 0)
     task.wait(0.3)
 
-    local currentPos = hrp.Position
-    local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
-    hrp.CFrame = CFrame.new(currentPos.X, currentPos.Y + height, currentPos.Z) * CFrame.Angles(rx, ry, rz)
+    -- Calculate target vertical position
+    local startPos = hrp.Position
+    local targetY = startPos.Y + height
 
+    -- Set new CFrame with the desired height while keeping the current rotation
+    local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
+    hrp.CFrame = CFrame.new(startPos.X, targetY, startPos.Z) * CFrame.Angles(rx, ry, rz)
+
+    -- Wait until the player's Y position reaches (or nearly reaches) the target height
+    repeat
+        task.wait(0.05)
+    until hrp.Position.Y >= targetY - 0.1  -- allow a small tolerance
+
+    -- Now lock the player in place
     hrp.Anchored = true
     airlock = true
 
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-        "Airlocked",
-        "All"
-    )
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Airlocked", "All")
 end
 
 cmds["unairlock"] = function(args, p)
