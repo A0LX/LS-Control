@@ -421,7 +421,7 @@ cmds["airlock"] = function(args, p)
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
-    -- Determine the target height (default is 10 studs above current position)
+    -- Determine the target height above the player's current position (default 10 studs)
     local height = 10
     if args[1] then
         local customHeight = tonumber(args[1])
@@ -437,21 +437,40 @@ cmds["airlock"] = function(args, p)
     task.wait(0.3)
 
     -- Calculate the target vertical position
-    local targetY = hrp.Position.Y + height
-    local rx, ry, rz = hrp.CFrame:ToEulerAnglesXYZ()
+    local currentPos = hrp.Position
+    local targetY = currentPos.Y + height
 
-    -- Loop until the player's Y position is at the target (within a small tolerance)
-    while math.abs(hrp.Position.Y - targetY) > 0.1 do
-        local currentPos = hrp.Position
-        hrp.CFrame = CFrame.new(currentPos.X, targetY, currentPos.Z) * CFrame.Angles(rx, ry, rz)
-        task.wait(0.05)
-    end
+    -- Create a temporary platform part
+    local platform = Instance.new("Part")
+    platform.Name = "AirlockPlatform"
+    platform.Size = Vector3.new(5, 1, 5)       -- size can be adjusted as needed
+    platform.Anchored = true
+    platform.CanCollide = true
+    -- Set the platform's position so its top surface is at targetY:
+    platform.Position = Vector3.new(currentPos.X, targetY - (platform.Size.Y / 2), currentPos.Z)
+    platform.Parent = workspace
 
-    -- Anchor the player once the target height is reached
+    -- Teleport the player so that the HumanoidRootPart is on top of the platform.
+    -- Adjusting by half the platform's height so that the HRP sits directly on it.
+    hrp.CFrame = CFrame.new(currentPos.X, targetY + (platform.Size.Y / 2), currentPos.Z)
+    
+    -- Wait a brief moment to ensure the player's physics settle on the platform.
+    task.wait(0.2)
+    
+    -- Anchor the player once they're on the platform
     hrp.Anchored = true
     airlock = true
+
+    -- Optionally notify others
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Airlocked", "All")
+    
+    -- Remove the temporary platform after a short delay
+    task.wait(0.1)
+    if platform and platform.Parent then
+        platform:Destroy()
+    end
 end
+
 
 cmds["unairlock"] = function(args, p)
     local char = player.Character
