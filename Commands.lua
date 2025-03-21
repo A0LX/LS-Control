@@ -467,6 +467,7 @@ cmds["line"] = function(args, p)
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
         return 
     end
+    player.Character.HumanoidRootPart.Anchored = false
     local controllerRoot = p.Character.HumanoidRootPart
     -- Base formation point is 2 studs behind the controller
     local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, 2)
@@ -496,6 +497,7 @@ cmds["circle"] = function(args, p)
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
         return 
     end
+    player.Character.HumanoidRootPart.Anchored = false
     local controllerRoot = p.Character.HumanoidRootPart
     local basePos = controllerRoot.Position
     local altList = _G.LSDropper.alts or {}
