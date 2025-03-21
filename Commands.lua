@@ -65,7 +65,7 @@ end
 -- 3) HELPER: Figure out which alt index this local player is.
 local function getAltIndex()
     local userId = player.UserId
-    for i, altUserId in pairs(_G.LSDropper.alts) do
+    for i, altUserId in pairs(_G.LSDropper.alts or {}) do
         if altUserId == userId then
             return i
         end
@@ -156,7 +156,7 @@ local function getMoneyOnFloor()
                     local numericString = text:gsub("[^%d]", "")
                     local amount = tonumber(numericString)
                     if amount then
-                        total += amount
+                        total = total + amount
                     end
                 end
             end
@@ -170,31 +170,25 @@ local function dropBag(amount)
     game.ReplicatedStorage.MainEvent:FireServer("DropMoney", amount)
 end
 
--- re -> Respawn
-cmds["re"] = function(args, p)
-    local origin_spot = player.Character.HumanoidRootPart.CFrame
-    player.Character.Humanoid.Health = 0
-    wait(7.5)
-    player.Character.HumanoidRootPart.CFrame = origin_spot
+-- /rejoin
+cmds["rejoin"] = function(args, p)
+    local tpservice = game:GetService("TeleportService")
+    tpservice:Teleport(game.PlaceId, player)
 end
 
--- freeze -> Toggles anchored
-cmds["freeze"] = function(args, p)
-    player.Character.HumanoidRootPart.Anchored = not player.Character.HumanoidRootPart.Anchored
-end
-
--- chat -> /chat [message...]
-cmds["chat"] = function(args, p)
-    if (args[1] == "" or args[1] == nil) then
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("LS ON TOP!", "All")
-    else
-        local str = ""
-        for i = 1, 50 do
-            if (args[i]) then
-                str = str .. " " .. args[i]
-            end
+-- /wallet => toggles wallet equip/unequip (FIXED)
+cmds["wallet"] = function(args, p)
+    local backpack = player.Backpack
+    if not wallet then
+        if backpack:FindFirstChild("[Wallet]") then
+            player.Character.Humanoid:EquipTool(backpack["[Wallet]"])
         end
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(str, "All")
+        wallet = true
+    else
+        if player.Character:FindFirstChild("[Wallet]") then
+            player.Character.Humanoid:UnequipTools()
+        end
+        wallet = false
     end
 end
 
@@ -213,7 +207,7 @@ cmds["drop"] = function(args, p)
     end
 end
 
--- /cdrop
+-- /cdrop with 0.5 s check delay in the loop.
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
     print("[cdrop] => textAmount:", textAmount)
@@ -237,7 +231,7 @@ cmds["cdrop"] = function(args, p)
 
         coroutine.wrap(function()
             repeat
-                wait(2.5)
+                wait(0.5)
                 dropBag(15000)
             until not dropFolder
                or not cDropping
@@ -276,25 +270,26 @@ cmds["stop"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping!", "All")
 end
 
+-- Teleport helper that preserves current rotation.
 local function teleportToLocation(loc, anchorAfter)
     local altIdx = getAltIndex() or 1
     local hrp = player.Character.HumanoidRootPart
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(loc .. "!", "All")
-
     hrp.Anchored = false
+    local currentRot = hrp.CFrame - hrp.CFrame.p  -- capture rotation only
 
     if loc == "bank" then
-        hrp.CFrame = getBankPosition(altIdx)
+        hrp.CFrame = getBankPosition(altIdx) * currentRot
     elseif loc == "klub" then
-        hrp.CFrame = getKlubPosition(altIdx)
+        hrp.CFrame = getKlubPosition(altIdx) * currentRot
     elseif loc == "train" then
         if trainPositions[altIdx] then
-            hrp.CFrame = trainPositions[altIdx]
+            hrp.CFrame = trainPositions[altIdx] * currentRot
         else
-            hrp.CFrame = trainPositions[1]
+            hrp.CFrame = trainPositions[1] * currentRot
         end
     elseif loc == "roof" then
-        hrp.CFrame = getRoofPosition(altIdx)
+        hrp.CFrame = getRoofPosition(altIdx) * currentRot
     end
 
     if anchorAfter then
@@ -343,85 +338,15 @@ cmds["goto"] = function(args, p)
     end
 end
 
--- /rejoin
-cmds["rejoin"] = function(args, p)
-    local tpservice = game:GetService("TeleportService")
-    tpservice:Teleport(game.PlaceId, player)
-end
-
--- /wallet => toggles wallet equip/unequip (FIXED)
-cmds["wallet"] = function(args, p)
-    local backpack = player.Backpack
-    if (wallet == false) then
-        if backpack:FindFirstChild("[Wallet]") then
-            player.Character.Humanoid:EquipTool(backpack["[Wallet]"])
-        end
-        wallet = true
-    else
-        if player.Character:FindFirstChild("[Wallet]") then
-            player.Character.Humanoid:UnequipTools()
-        end
-        wallet = false
-    end
-end
-
--- AIRWALK code
-local RunService = game:GetService("RunService")
-
-local function ForEach(t, f)
-    for Index, Value in pairs(t) do
-        f(Value, Index)
-    end
-end
-_G.ForEach = ForEach
-
-local function Create(ClassName)
-    local Object = Instance.new(ClassName)
-    return function(Properties)
-        ForEach(Properties, function(Value, Property)
-            Object[Property] = Value
-        end)
-        return Object
-    end
-end
-_G.Create = Create
-
-do
-    local airwalkState = false
-    local currentPart = nil
-    RunService.RenderStepped:Connect(function()
-        if airwalkState then
-            if not currentPart then
-                currentPart = Create("Part") {
-                    Parent = workspace.CurrentCamera,
-                    Name = "AWP",
-                    Transparency = 1,
-                    Size = Vector3.new(2, 1, 2),
-                    Anchored = true,
-                }
-            end
-            local character = player.Character
-            if character and character:FindFirstChild("HumanoidRootPart") then
-                currentPart.CFrame = character.HumanoidRootPart.CFrame - Vector3.new(0, 3.6, 0)
-            end
-        else
-            if currentPart then
-                currentPart:Destroy()
-                currentPart = nil
-            end
-        end
-    end)
-end
-
--- /airlock => floats you in place
+-- /airlock: Creates a temporary platform at the designated height,
+-- teleports the player onto it (keeping the same rotation), anchors, then deletes the platform.
 cmds["airlock"] = function(args, p)
     local char = player.Character
     if not char then return end
-
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
-    -- Determine the target height above the player's current position (default 10 studs)
+    -- Determine target height offset (default is 10 studs)
     local height = 10
     if args[1] then
         local customHeight = tonumber(args[1])
@@ -430,60 +355,51 @@ cmds["airlock"] = function(args, p)
         end
     end
 
-    -- Unanchor and reset movement to allow repositioning
+    -- Preserve current rotation
+    local currentCFrame = hrp.CFrame
+    local currentRot = currentCFrame - currentCFrame.p
+
     hrp.Anchored = false
-    hrp.Velocity = Vector3.new(0, 0, 0)
-    hrp.RotVelocity = Vector3.new(0, 0, 0)
+    hrp.Velocity = Vector3.new(0,0,0)
+    hrp.RotVelocity = Vector3.new(0,0,0)
     task.wait(0.3)
 
-    -- Calculate the target vertical position
     local currentPos = hrp.Position
     local targetY = currentPos.Y + height
 
-    -- Create a temporary platform part
+    -- Create temporary platform whose top is exactly at targetY
     local platform = Instance.new("Part")
     platform.Name = "AirlockPlatform"
-    platform.Size = Vector3.new(5, 1, 5)       -- size can be adjusted as needed
+    platform.Size = Vector3.new(5, 1, 5)
     platform.Anchored = true
     platform.CanCollide = true
-    -- Set the platform's position so its top surface is at targetY:
     platform.Position = Vector3.new(currentPos.X, targetY - (platform.Size.Y / 2), currentPos.Z)
     platform.Parent = workspace
 
-    -- Teleport the player so that the HumanoidRootPart is on top of the platform.
-    -- Adjusting by half the platform's height so that the HRP sits directly on it.
-    hrp.CFrame = CFrame.new(currentPos.X, targetY + (platform.Size.Y / 2), currentPos.Z)
-    
-    -- Wait a brief moment to ensure the player's physics settle on the platform.
+    -- Teleport the player so that HRP sits on top of the platform,
+    -- preserving the current rotation.
+    hrp.CFrame = CFrame.new(currentPos.X, targetY + (platform.Size.Y / 2), currentPos.Z) * currentRot
     task.wait(0.2)
-    
-    -- Anchor the player once they're on the platform
     hrp.Anchored = true
     airlock = true
-
-    -- Optionally notify others
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Airlocked", "All")
-    
-    -- Remove the temporary platform after a short delay
     task.wait(0.1)
     if platform and platform.Parent then
         platform:Destroy()
     end
 end
 
-
+-- /unairlock: Unanchors the player while keeping their rotation unchanged.
 cmds["unairlock"] = function(args, p)
     local char = player.Character
     if not char then return end
-
     local hrp = char:FindFirstChild("HumanoidRootPart")
-    if hrp and hrp.Anchored then
+    if hrp then
+        local currentCFrame = hrp.CFrame  -- preserve rotation
         hrp.Anchored = false
+        hrp.CFrame = currentCFrame
         airlock = false
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "Unairlocked!",
-            "All"
-        )
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Unairlocked!", "All")
     end
 end
 
@@ -541,5 +457,63 @@ cmds["bring"] = function(args, p)
     end
 end
 
--- Expose to _G
+----------------------------------------------------------
+-- New Formation Commands
+----------------------------------------------------------
+
+-- /line: Arrange alts in a lateral line relative to the controller.
+cmds["line"] = function(args, p)
+    if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
+        return 
+    end
+    local controllerRoot = p.Character.HumanoidRootPart
+    -- Base formation point is 2 studs behind the controller
+    local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, -2)
+    
+    local altList = _G.LSDropper.alts or {}
+    local total = #altList
+    local myIndex = getAltIndex()
+    if not myIndex then return end
+
+    -- Compute lateral offset.
+    local mid = (total + 1) / 2
+    local offsetDist = (myIndex - mid) * 2  -- 2 studs spacing
+    local rightVec = controllerRoot.CFrame.RightVector
+
+    local targetPos = formationBase.Position + rightVec * offsetDist
+    local hrp = player.Character.HumanoidRootPart
+    -- Teleport while matching controller’s forward direction
+    hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line formation", "All")
+end
+
+-- /circle: Arrange alts in a circle around the controller.
+cmds["circle"] = function(args, p)
+    if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
+        return 
+    end
+    local controllerRoot = p.Character.HumanoidRootPart
+    local basePos = controllerRoot.Position
+    local altList = _G.LSDropper.alts or {}
+    local total = #altList
+    local myIndex = getAltIndex()
+    if not myIndex then return end
+
+    -- Divide 365° among all alts.
+    local anglePerAlt = math.rad(365 / total)
+    local myAngle = (myIndex - 1) * anglePerAlt
+
+    -- Rotate controller's forward vector by myAngle around Y.
+    local rotatedDir = (CFrame.fromAxisAngle(Vector3.new(0,1,0), myAngle) * Vector3.new(controllerRoot.CFrame.LookVector.X, controllerRoot.CFrame.LookVector.Y, controllerRoot.CFrame.LookVector.Z)).Unit
+    local radius = 4  -- 4 studs away from the controller
+    local targetPos = basePos + rotatedDir * radius
+
+    local hrp = player.Character.HumanoidRootPart
+    hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle formation", "All")
+end
+
+-- Expose commands to _G
 _G.LSCommands = cmds
