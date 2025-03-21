@@ -1,4 +1,3 @@
--- Commands.lua (Shorter grid-based approach + debug prints)
 local cmds = {}
 local player = game.Players.LocalPlayer
 
@@ -214,7 +213,7 @@ cmds["drop"] = function(args, p)
     end
 end
 
--- /cdrop (debug prints for argument parsing & folder check)
+-- /cdrop
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
     print("[cdrop] => textAmount:", textAmount)
@@ -350,12 +349,12 @@ cmds["rejoin"] = function(args, p)
     tpservice:Teleport(game.PlaceId, player)
 end
 
--- /wallet => toggles wallet equip/unequip
+-- /wallet => toggles wallet equip/unequip (FIXED)
 cmds["wallet"] = function(args, p)
+    local backpack = player.Backpack
     if (wallet == false) then
-        local backpack = player.Backpack
         if backpack:FindFirstChild("[Wallet]") then
-            player.Character.Humanoid:EquipTool(backpack.[Wallet])
+            player.Character.Humanoid:EquipTool(backpack["[Wallet]"])
         end
         wallet = true
     else
