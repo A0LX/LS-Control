@@ -586,12 +586,11 @@ cmds["ad"] = function(args, p)
         adMessage = text
     end
     advertising = true
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started advertising!", "All")
 
     coroutine.wrap(function()
         while advertising do
             game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(adMessage, "All")
-            wait(15) -- repeat every 3s (adjust if needed)
+            wait(7) -- repeat every 3s (adjust if needed)
         end
     end)()
 end
