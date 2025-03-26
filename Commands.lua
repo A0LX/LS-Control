@@ -608,8 +608,9 @@ cmds["admsg"] = function(args, p)
         return
     end
     adMessage = text
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad = ",..adMessage, "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad = "..adMessage, "All")
 end
+
 
 -- Redeem code through chat command
 cmds["code"] = function(args, p)
