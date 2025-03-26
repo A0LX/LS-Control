@@ -1,12 +1,18 @@
 local cmds = {}
 local player = game.Players.LocalPlayer
 
+-- Globals
 wallet = false
-dropping = false   -- for /drop
-cDropping = false  -- for /cdrop
+dropping = false    -- for /drop
+cDropping = false   -- for /cdrop
 airlock = false
+advertising = false
+adMessage = "Join the best group!"   -- default ad message
+fpsCap = fps
 
+--
 -- 1) HELPER: Parse short-format user input => integer (with debug)
+--
 local function parseShortInput(str)
     print("parseShortInput => raw input:", str)
     if not str then return nil end
@@ -39,7 +45,9 @@ local function parseShortInput(str)
     return finalVal
 end
 
+--
 -- 2) HELPER: Format large integers in short form
+--
 local function shortNumber(n)
     if n >= 1000000 then
         local remainder = n % 1000000
@@ -62,7 +70,9 @@ local function shortNumber(n)
     end
 end
 
+--
 -- 3) HELPER: Figure out which alt index this local player is.
+--
 local function getAltIndex()
     local userId = player.UserId
     for i, altUserId in pairs(_G.LSDropper.alts or {}) do
@@ -73,7 +83,9 @@ local function getAltIndex()
     return nil
 end
 
+--
 -- Helper: compute a grid-based position from alt index.
+--
 local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd, y)
     local total = columns * rows
     if index < 1 then index = 1 end
@@ -89,7 +101,9 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
     return CFrame.new(x, y, z)
 end
 
+--
 -- Bank: 5 columns x 6 rows
+--
 local function getBankPosition(altIndex)
     return getGridPosition(
         altIndex,         -- index
@@ -98,10 +112,12 @@ local function getBankPosition(altIndex)
         -338, -306,      -- zStart, zEnd
         21               -- y
     )
-    return base * CFrame.Angles(0, math.rad(0), 0)
+    -- If you wanted rotation, you’d do e.g. return base * CFrame.Angles(…)
 end
 
+--
 -- Klub: 5 columns x 6 rows
+--
 local function getKlubPosition(altIndex)
     return getGridPosition(
         altIndex,          -- index
@@ -110,11 +126,11 @@ local function getKlubPosition(altIndex)
         -404, -354,       -- zStart, zEnd
         -6.2              -- y
     )
-    return base * CFrame.Angles(0, math.rad(0), 0)
 end
 
+--
 -- Roof: 5 columns x 6 rows (total 30)
--- from start=(-446,39,-304) to end=(-516,39,-267), rotated +90 deg.
+--
 local function getRoofPosition(altIndex)
     local base = getGridPosition(
         altIndex,    -- alt index
@@ -123,10 +139,13 @@ local function getRoofPosition(altIndex)
         -304, -267,  -- zStart, zEnd
         39           -- y
     )
+    -- Rotate so that “forward” is turned 270 degrees
     return base * CFrame.Angles(0, math.rad(270), 0)
 end
 
--- We'll keep train positions as is (small set)
+--
+-- Train positions
+--
 local trainPositions = {
     [1]  = CFrame.new(600, 34, -150),
     [2]  = CFrame.new(601, 34, -150),
@@ -140,7 +159,9 @@ local trainPositions = {
     [10] = CFrame.new(609, 34, -150),
 }
 
+--
 -- Summation of money on the floor
+--
 local function getMoneyOnFloor()
     local total = 0
     local dropFolder = workspace:FindFirstChild("Ignored") and workspace.Ignored:FindFirstChild("Drop")
@@ -167,10 +188,16 @@ local function getMoneyOnFloor()
     return total
 end
 
+--
 -- Helper to drop a bag of money
+--
 local function dropBag(amount)
     game.ReplicatedStorage.MainEvent:FireServer("DropMoney", amount)
 end
+
+--------------------------------------------------------------------------
+-- Existing Commands
+--------------------------------------------------------------------------
 
 -- /rejoin
 cmds["rejoin"] = function(args, p)
@@ -214,7 +241,7 @@ cmds["drop"] = function(args, p)
     end
 end
 
--- /cdrop with 0.5 s check delay in the loop.
+-- /cdrop with 0.5 s check delay in the loop
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
     print("[cdrop] => textAmount:", textAmount)
@@ -262,7 +289,7 @@ cmds["cdrop"] = function(args, p)
     end
 end
 
--- /dropped
+-- /dropped => checks how much is on the floor
 cmds["dropped"] = function(args, p)
     local floorTotal = getMoneyOnFloor()
     local shortValue = shortNumber(floorTotal)
@@ -274,14 +301,19 @@ end
 cmds["stop"] = function(args, p)
     dropping = false
     cDropping = false
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping!", "All")
+    advertising = false  -- also stop advertising
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping & ads!", "All")
 end
 
+--
 -- Teleport helper that preserves current rotation.
+--
 local function teleportToLocation(loc, anchorAfter)
     local altIdx = getAltIndex() or 1
     local hrp = player.Character.HumanoidRootPart
+    -- For user feedback
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(loc .. "!", "All")
+
     hrp.Anchored = false
     local currentRot = hrp.CFrame - hrp.CFrame.p  -- capture rotation only
 
@@ -323,7 +355,7 @@ cmds["tpf"] = function(args, p)
     teleportToLocation(string.lower(args[1]), true)
 end
 
--- goto => /goto [playerName]
+-- /goto => follow the main player's character
 cmds["goto"] = function(args, p)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
@@ -345,8 +377,7 @@ cmds["goto"] = function(args, p)
     end
 end
 
--- /airlock: Creates a temporary platform at the designated height,
--- teleports the player onto it (keeping the same rotation), anchors, then deletes the platform.
+-- /airlock => create a temporary platform at specified height
 cmds["airlock"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -383,26 +414,26 @@ cmds["airlock"] = function(args, p)
     platform.Position = Vector3.new(currentPos.X, targetY - (platform.Size.Y / 2), currentPos.Z)
     platform.Parent = workspace
 
-    -- Teleport the player so that HRP sits on top of the platform,
-    -- preserving the current rotation.
+    -- Teleport the alt so that HRP sits on top, preserving rotation
     hrp.CFrame = CFrame.new(currentPos.X, targetY + (platform.Size.Y / 2), currentPos.Z) * currentRot
     task.wait(0.2)
     hrp.Anchored = true
     airlock = true
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Airlocked", "All")
+
     task.wait(0.1)
     if platform and platform.Parent then
         platform:Destroy()
     end
 end
 
--- /unairlock: Unanchors the player while keeping their rotation unchanged.
+-- /unairlock => unanchor
 cmds["unairlock"] = function(args, p)
     local char = player.Character
     if not char then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if hrp then
-        local currentCFrame = hrp.CFrame  -- preserve rotation
+        local currentCFrame = hrp.CFrame
         hrp.Anchored = false
         hrp.CFrame = currentCFrame
         airlock = false
@@ -410,22 +441,23 @@ cmds["unairlock"] = function(args, p)
     end
 end
 
--- /spot => stand infront of controlling alt
+-- /spot => stand in front of controlling alt
 cmds["spot"] = function(args, p)
     if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
         local controllerRoot = p.Character.HumanoidRootPart
-        player.Character.HumanoidRootPart.Anchored = false
+        local hrp = player.Character.HumanoidRootPart
+        hrp.Anchored = false
         local targetCFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
-        player.Character.HumanoidRootPart.CFrame = targetCFrame
+        hrp.CFrame = targetCFrame
         wait(0.3)
-        player.Character.HumanoidRootPart.Anchored = true
+        hrp.Anchored = true
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Spot!", "All")
     else
         warn("Controller's HumanoidRootPart not found; cannot execute spot command.")
     end
 end
 
--- /bring => /bring <partialName>
+-- /bring => bring target to me
 cmds["bring"] = function(args, p)
     if not args[1] or args[1] == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /bring <playerName>", "All")
@@ -452,13 +484,15 @@ cmds["bring"] = function(args, p)
     end
 end
 
--- /line: Arrange alts in a lateral line relative to the controller.
+-- /line => Arrange alts in a line behind the controller
 cmds["line"] = function(args, p)
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
         return 
     end
-    player.Character.HumanoidRootPart.Anchored = false
+    local hrp = player.Character.HumanoidRootPart
+    hrp.Anchored = false
+    
     local controllerRoot = p.Character.HumanoidRootPart
     -- Base formation point is 2 studs behind the controller
     local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, 2)
@@ -468,27 +502,28 @@ cmds["line"] = function(args, p)
     local myIndex = getAltIndex()
     if not myIndex then return end
 
-    -- Compute lateral offset.
+    -- Compute lateral offset
     local mid = (total + 1) / 2
-    local offsetDist = (myIndex - mid) * 2  -- 2 studs spacing
+    local offsetDist = (myIndex - mid) * 2  -- spacing
     local rightVec = controllerRoot.CFrame.RightVector
 
     local targetPos = formationBase.Position + rightVec * offsetDist
-    local hrp = player.Character.HumanoidRootPart
     -- Teleport while matching controller’s forward direction
     hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
     wait(0.3)
-    player.Character.HumanoidRootPart.Anchored = true
+    hrp.Anchored = true
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line!", "All")
 end
 
--- /circle: Arrange alts in a circle around the controller.
+-- /circle => Arrange alts in a circle around the controller
 cmds["circle"] = function(args, p)
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
         return 
     end
-    player.Character.HumanoidRootPart.Anchored = false
+    local hrp = player.Character.HumanoidRootPart
+    hrp.Anchored = false
+
     local controllerRoot = p.Character.HumanoidRootPart
     local basePos = controllerRoot.Position
     local altList = _G.LSDropper.alts or {}
@@ -496,22 +531,134 @@ cmds["circle"] = function(args, p)
     local myIndex = getAltIndex()
     if not myIndex then return end
 
-    -- Divide 360° among all alts.
+    -- Circle geometry
     local anglePerAlt = math.rad(360 / total)
     local myAngle = (myIndex - 1) * anglePerAlt
 
-    -- Rotate controller's forward vector by myAngle around Y.
-    local rotatedDir = (CFrame.fromAxisAngle(Vector3.new(0,1,0), myAngle) * Vector3.new(controllerRoot.CFrame.LookVector.X, controllerRoot.CFrame.LookVector.Y, controllerRoot.CFrame.LookVector.Z)).Unit
-    local radius = 4  -- 4 studs away from the controller
-    local targetPos = basePos + rotatedDir * radius
+    -- Rotate controller's forward vector by myAngle around Y
+    local rotatedDir = (CFrame.fromAxisAngle(Vector3.new(0,1,0), myAngle)
+        * Vector3.new(controllerRoot.CFrame.LookVector.X,
+                      controllerRoot.CFrame.LookVector.Y,
+                      controllerRoot.CFrame.LookVector.Z)
+    ).Unit
+    local radius = 4
+    if args[1] then
+        local r = tonumber(args[1])
+        if r then
+            radius = r
+        end
+    end
 
-    local hrp = player.Character.HumanoidRootPart
-    -- Set CFrame so that the alt faces the controller's position (basePos)
+    local targetPos = basePos + rotatedDir * radius
     hrp.CFrame = CFrame.new(targetPos, basePos)
     wait(0.3)
-    player.Character.HumanoidRootPart.Anchored = true
+    hrp.Anchored = true
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle!", "All")
 end
 
--- Expose commands to _G
+--------------------------------------------------------------------------
+-- NEW Commands
+--------------------------------------------------------------------------
+
+-- /hide => send alt underground (Y = -10 by default)
+cmds["hide"] = function(args, p)
+    local char = player.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        hrp.Anchored = false
+        wait(0.1)
+        local currentCFrame = hrp.CFrame
+        -- Move alt ~10 studs below ground
+        hrp.CFrame = CFrame.new(currentCFrame.X, -10, currentCFrame.Z)
+        wait(0.2)
+        hrp.Anchored = true
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Hidden underground!", "All")
+    end
+end
+
+-- /ad => alts start repeatedly chatting the current ad message
+-- (stop with /stop or /ad "" to cancel)
+cmds["ad"] = function(args, p)
+    local text = table.concat(args, " ")
+    if text and text ~= "" then
+        adMessage = text
+    end
+    advertising = true
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started advertising!", "All")
+
+    coroutine.wrap(function()
+        while advertising do
+            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(adMessage, "All")
+            wait(3) -- repeat every 3s (adjust if needed)
+        end
+    end)()
+end
+
+-- /admsg => change the advertising message without restarting the ad loop
+cmds["admsg"] = function(args, p)
+    local text = table.concat(args, " ")
+    if text == "" then
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /admsg <newMessage>", "All")
+        return
+    end
+    adMessage = text
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad message updated!", "All")
+end
+
+-- /stock => Alts chat total stock of all alts
+cmds["stock"] = function(args, p)
+    local altList = _G.LSDropper.alts or {}
+    local total = #altList
+    local myIndex = getAltIndex() or 1
+    local msg = "We have "..tostring(total).." alts in stock. I'm alt #"..tostring(myIndex).."."
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
+end
+
+-- /fps => set fps cap (if your environment supports setfpscap)
+cmds["fps"] = function(args, p)
+    local val = tonumber(args[1])
+    if val then
+        fpsCap = val
+        setfpscap(fpsCap)
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("FPS cap set to "..val, "All")
+    else
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /fps <number>", "All")
+    end
+end
+
+-- Redeem code through chat command
+cmds["code"] = function(args, p)
+    local codeToRedeem = table.concat(args, " ")
+    
+    if codeToRedeem == "" then
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /code <SomeDahoodCode>", "All")
+        return
+    end
+
+    -- Tell the player the code is being redeemed
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Redeeming code: " .. codeToRedeem, "All")
+
+    -- Send the redeem request to the server
+    local args = {
+        [1] = "EnterPromoCode",
+        [2] = codeToRedeem
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer(unpack(args))
+end
+
+
+-- /say => alt says the provided message once
+cmds["say"] = function(args, p)
+    local message = table.concat(args, " ")
+    if message == "" then
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /say <message>", "All")
+        return
+    end
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+end
+
+--------------------------------------------------------------------------
+-- Expose commands to global
+--------------------------------------------------------------------------
 _G.LSCommands = cmds
