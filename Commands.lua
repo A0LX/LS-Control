@@ -178,7 +178,7 @@ cmds["rejoin"] = function(args, p)
     tpservice:Teleport(game.PlaceId, player)
 end
 
--- /wallet => toggles wallet equip/unequip (FIXED)
+-- /wallet => toggles wallet equip/unequip
 cmds["wallet"] = function(args, p)
     local backpack = player.Backpack
     if not wallet then
@@ -206,6 +206,11 @@ cmds["drop"] = function(args, p)
             dropBag(15000)
             wait(2.5)
         end
+    end
+    if dropping then
+        dropping = false
+        cDropping = false
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping!", "All")
     end
 end
 
@@ -405,7 +410,7 @@ cmds["unairlock"] = function(args, p)
     end
 end
 
--- /spot => stand behind controlling alt
+-- /spot => stand infront of controlling alt
 cmds["spot"] = function(args, p)
     if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
         local controllerRoot = p.Character.HumanoidRootPart
@@ -417,18 +422,6 @@ cmds["spot"] = function(args, p)
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Spot!", "All")
     else
         warn("Controller's HumanoidRootPart not found; cannot execute spot command.")
-    end
-end
-
--- /whoami => prints which alt index we are
-cmds["whoami"] = function(args, p)
-    local idx = getAltIndex()
-    local userId = player.UserId
-
-    if idx then
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("I am alt #" .. tostring(idx) .. " with userId " .. tostring(userId), "All")
-    else
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("I am not recognized as an alt in LSDropper.alts", "All")
     end
 end
 
@@ -458,10 +451,6 @@ cmds["bring"] = function(args, p)
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Could not find or bring target "..args[1], "All")
     end
 end
-
-----------------------------------------------------------
--- New Formation Commands
-----------------------------------------------------------
 
 -- /line: Arrange alts in a lateral line relative to the controller.
 cmds["line"] = function(args, p)
@@ -494,7 +483,6 @@ cmds["line"] = function(args, p)
 end
 
 -- /circle: Arrange alts in a circle around the controller.
--- This version sets the alt's CFrame so that it faces the controller.
 cmds["circle"] = function(args, p)
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
