@@ -1,6 +1,7 @@
 local cmds = {}
 local player = game.Players.LocalPlayer
 
+local config = _G.LSDropper
 local fpsCap = config.fps
 local adMessage = config.adx
 
