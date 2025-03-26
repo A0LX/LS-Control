@@ -581,19 +581,32 @@ end
 -- /ad => alts start repeatedly chatting the current ad message
 -- (stop with /stop or /ad "" to cancel)
 cmds["ad"] = function(args, p)
-    local text = table.concat(args, " ")
-    if text and text ~= "" then
-        adMessage = adx
+    -- If we're already advertising, toggle it off
+    if advertising then
+        advertising = false
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped advertising!", "All")
+        return
     end
+    
+    -- Otherwise, start advertising
+    local text = table.concat(args, " ")
+    -- Only update adMessage if user provided a new message
+    if text and text ~= "" then
+        adMessage = text
+    end
+    
     advertising = true
-
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started advertising with message: ".. adMessage, "All")
+    
+    -- Start a coroutine that repeatedly fires off the ad
     coroutine.wrap(function()
         while advertising do
             game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(adMessage, "All")
-            wait(7) -- repeat every 3s (adjust if needed)
+            wait(7)  -- change delay as needed
         end
     end)()
 end
+
 
 -- /admsg => change the advertising message without restarting the ad loop
 cmds["admsg"] = function(args, p)
