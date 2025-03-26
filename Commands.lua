@@ -606,15 +606,6 @@ cmds["admsg"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad message updated!", "All")
 end
 
--- /stock => Alts chat total stock of all alts
-cmds["stock"] = function(args, p)
-    local altList = _G.LSDropper.alts or {}
-    local total = #altList
-    local myIndex = getAltIndex() or 1
-    local msg = "We have "..tostring(total).." alts in stock. I'm alt #"..tostring(myIndex).."."
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
-end
-
 -- /fps => set fps cap (if your environment supports setfpscap)
 cmds["fps"] = function(args, p)
     local val = tonumber(args[1])
