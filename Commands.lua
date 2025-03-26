@@ -10,7 +10,7 @@ dropping = false    -- for /drop
 cDropping = false   -- for /cdrop
 airlock = false
 advertising = false
-
+adMessage = adx
 --
 -- 1) HELPER: Parse short-format user input => integer (with debug)
 --
