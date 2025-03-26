@@ -58,7 +58,6 @@ print("Loading Libraries...")
 loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
 print("Libraries loaded.")
 print("LS loaded!")
-print(adMessage)
 
 game.StarterGui:SetCore("SendNotification", {
     Title = "LS",

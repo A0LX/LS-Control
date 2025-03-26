@@ -585,20 +585,17 @@ cmds["ad"] = function(args, p)
     -- If we're already advertising, toggle it off
     if advertising then
         advertising = false
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped advertising!", "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped!", "All")
         return
     end
-    
-
-    
+       
     advertising = true
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started advertising with message: ".. adMessage, "All")
     
     -- Start a coroutine that repeatedly fires off the ad
     coroutine.wrap(function()
         while advertising do
             game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(adMessage, "All")
-            wait(7)  -- change delay as needed
+            wait(10)  -- change delay as needed
         end
     end)()
 end
@@ -612,7 +609,7 @@ cmds["admsg"] = function(args, p)
         return
     end
     adMessage = text
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad message updated!", "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad = ",..adMessage, "All")
 end
 
 -- /fps => set fps cap (if your environment supports setfpscap)
