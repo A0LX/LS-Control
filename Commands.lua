@@ -1,9 +1,8 @@
 local cmds = {}
 local player = game.Players.LocalPlayer
 
-local LSD = _G.LSDropper or {}
-local fpsCap = LSD.fps or 5
-local adMessage = LSD.adMessage or "Fail"
+local fpsCap = fps or 5
+local adMessage = adMessage or "Fail"
 
 -- Globals
 wallet = false
@@ -11,8 +10,6 @@ dropping = false    -- for /drop
 cDropping = false   -- for /cdrop
 airlock = false
 advertising = false
-adMessage = adx   -- default ad message
-fpsCap = fps
 
 --
 -- 1) HELPER: Parse short-format user input => integer (with debug)
