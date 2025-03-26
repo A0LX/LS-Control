@@ -10,12 +10,10 @@ else
 end
 
 -- Limit to very low FPS to reduce overhead.
-setfpscap(5)
--- Disable 3D rendering for performance reasons on alts.
+setfpscap(fps)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
 print("Loading Commands...")
--- We point to the raw code on your GitHub – adjust if you want a local version
 loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/Commands.lua"))()
 print("Commands Loaded!")
 
