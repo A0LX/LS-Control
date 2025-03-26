@@ -14,7 +14,7 @@ setfpscap(fps)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
 print("Loading Commands...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/Commands.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/Commands.lua"))()
 print("Commands Loaded!")
 
 local VirtualUser = game:GetService("VirtualUser")
@@ -55,7 +55,7 @@ end)
 print("Command Handler ready.")
 
 print("Loading Libraries...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
 print("Libraries loaded.")
 print("LS loaded!")
 

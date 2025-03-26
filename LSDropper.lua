@@ -12,4 +12,4 @@ _G.LSDropper = {
     
     Prefix = "/"
 }
-loadstring(game:HttpGet("https://raw.githubusercontent.com/LS-AltControl/LS-Control/refs/heads/main/Loader.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/Loader.lua"))()
