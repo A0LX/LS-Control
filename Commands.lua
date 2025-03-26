@@ -2,7 +2,7 @@ local cmds = {}
 local player = game.Players.LocalPlayer
 
 local fpsCap = fps or 5
-local adMessage = adMessage or "Fail"
+local adMessage = adx or "Fail"
 
 -- Globals
 wallet = false
@@ -303,7 +303,7 @@ cmds["stop"] = function(args, p)
     dropping = false
     cDropping = false
     advertising = false  -- also stop advertising
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped dropping & ads!", "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped!", "All")
 end
 
 --
