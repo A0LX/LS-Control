@@ -2,7 +2,6 @@ local cmds = {}
 local player = game.Players.LocalPlayer
 
 local cl = _G.LSDropper
-local fpsCap = cl.fps
 local adMessage = cl.adx
 
 -- Globals
@@ -610,18 +609,6 @@ cmds["admsg"] = function(args, p)
     end
     adMessage = text
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad = ",..adMessage, "All")
-end
-
--- /fps => set fps cap (if your environment supports setfpscap)
-cmds["fps"] = function(args, p)
-    local val = tonumber(args[1])
-    if val then
-        cl.fps = val
-        setfpscap(cl.fps)
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("FPS cap set to "..val, "All")
-    else
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /fps <number>", "All")
-    end
 end
 
 -- Redeem code through chat command
