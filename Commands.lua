@@ -1,7 +1,7 @@
 local cmds = {}
 local player = game.Players.LocalPlayer
 
-local fpsCap = fps or 5
+local fpsCap = fps
 local adMessage = adx or "Fail"
 
 -- Globals
