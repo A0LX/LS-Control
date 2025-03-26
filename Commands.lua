@@ -1,13 +1,17 @@
 local cmds = {}
 local player = game.Players.LocalPlayer
 
+local LSD = _G.LSDropper or {}
+local fpsCap = (LSD.fps and LSD.fps[1]) or 5
+local adMessage = LSD.adMessage or "Fail"
+
 -- Globals
 wallet = false
 dropping = false    -- for /drop
 cDropping = false   -- for /cdrop
 airlock = false
 advertising = false
-adMessage = ad   -- default ad message
+adMessage = adx   -- default ad message
 fpsCap = fps
 
 --
@@ -590,7 +594,7 @@ cmds["ad"] = function(args, p)
     coroutine.wrap(function()
         while advertising do
             game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(adMessage, "All")
-            wait(3) -- repeat every 3s (adjust if needed)
+            wait(15) -- repeat every 3s (adjust if needed)
         end
     end)()
 end
