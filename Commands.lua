@@ -7,7 +7,7 @@ dropping = false    -- for /drop
 cDropping = false   -- for /cdrop
 airlock = false
 advertising = false
-adMessage = "Join the best group!"   -- default ad message
+adMessage = ad   -- default ad message
 fpsCap = fps
 
 --
