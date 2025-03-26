@@ -10,7 +10,7 @@ else
 end
 
 -- Limit to very low FPS to reduce overhead.
-setfpscap(fps)
+setfpscap(5)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
 print("Loading Commands...")
