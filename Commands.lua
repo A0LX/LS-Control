@@ -581,7 +581,10 @@ end
 -- /ad => alts start repeatedly chatting the current ad message
 -- (stop with /stop or /ad "" to cancel)
 cmds["ad"] = function(args, p)
-
+    local text = table.concat(args, " ")
+    if text and text ~= "" then
+        adMessage = adx
+    end
     advertising = true
 
     coroutine.wrap(function()
