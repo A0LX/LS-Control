@@ -616,8 +616,8 @@ end
 cmds["fps"] = function(args, p)
     local val = tonumber(args[1])
     if val then
-        fpsCap = val
-        setfpscap(fpsCap)
+        cl.fps = val
+        setfpscap(cl.fps)
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("FPS cap set to "..val, "All")
     else
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /fps <number>", "All")
