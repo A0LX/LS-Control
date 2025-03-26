@@ -2,7 +2,7 @@ local cmds = {}
 local player = game.Players.LocalPlayer
 
 local cl = _G.LSDropper
-local adMessage = cl.adx
+--local adMessage = cl.adx
 
 -- Globals
 wallet = false
