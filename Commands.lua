@@ -2,7 +2,7 @@ local cmds = {}
 local player = game.Players.LocalPlayer
 
 local LSD = _G.LSDropper or {}
-local fpsCap = (LSD.fps and LSD.fps[1]) or 5
+local fpsCap = LSD.fps or 5
 local adMessage = LSD.adMessage or "Fail"
 
 -- Globals

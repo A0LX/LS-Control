@@ -8,9 +8,9 @@ _G.LSDropper = {
         1234,
     },
 
-    fps = {5}
+    fps = 5,
 
-    adx = {"LS"}
+    adx = "LS",
     
     Prefix = "/"
 }
