@@ -1,9 +1,9 @@
 local cmds = {}
 local player = game.Players.LocalPlayer
 
-local config = _G.LSDropper
-local fpsCap = config.fps
-local adMessage = config.adx
+local cl = _G.LSDropper
+local fpsCap = cl.fps
+local adMessage = cl.adx
 
 -- Globals
 wallet = false
