@@ -589,12 +589,7 @@ cmds["ad"] = function(args, p)
         return
     end
     
-    -- Otherwise, start advertising
-    local text = table.concat(args, " ")
-    -- Only update adMessage if user provided a new message
-    if text and text ~= "" then
-        adMessage = text
-    end
+
     
     advertising = true
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started advertising with message: ".. adMessage, "All")
