@@ -210,13 +210,13 @@ local function teleportToLocation(loc, anchorAfter)
     hrp.Anchored = false
     local currentRot = hrp.CFrame - hrp.CFrame.p
     if loc == "bank" then
-        hrp.CFrame = getBankPosition(altIdx) * currentRot
+        hrp.CFrame = getBankPosition(altIdx)
     elseif loc == "klub" then
-        hrp.CFrame = getKlubPosition(altIdx) * currentRot
+        hrp.CFrame = getKlubPosition(altIdx)
     elseif loc == "train" then
-        hrp.CFrame = (trainPositions[altIdx] or trainPositions[1]) * currentRot
+        hrp.CFrame = (trainPositions[altIdx] or trainPositions[1])
     elseif loc == "roof" then
-        hrp.CFrame = getRoofPosition(altIdx) * currentRot
+        hrp.CFrame = getRoofPosition(altIdx)
     end
     if anchorAfter then
         wait(0.3)
