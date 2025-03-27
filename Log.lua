@@ -1,20 +1,17 @@
--- AltLogger.lua
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
 local AltLogger = {}
 
-local folderName = "LS"          -- Folder in the exploit workspace
+local folderName = "LS"
 local altLogFile = folderName.."/alts.json"
 
--- Ensure the "LS" folder exists in the executor workspace
 local function ensureFolderExists()
     if not isfolder(folderName) then
         makefolder(folderName)
     end
 end
 
--- Load all alt data from "LS/alts.json"
 function AltLogger:loadAlts()
     ensureFolderExists()
     if not isfile(altLogFile) then
@@ -38,12 +35,10 @@ function AltLogger:saveAlts(alts)
     writefile(altLogFile, jsonData)
 end
 
--- Assign a unique numeric ID to the current alt, if not already assigned
 function AltLogger:registerAlt()
     local alts = self:loadAlts()
     local userId = tostring(Players.LocalPlayer.UserId)
 
-    -- If this alt hasn't been registered, pick the next available numeric ID
     if not alts[userId] then
         local nextId = 1
         for _, existingId in pairs(alts) do
@@ -58,7 +53,6 @@ function AltLogger:registerAlt()
     return alts[userId]
 end
 
--- Return this alt's position among all in-game alts (sorted by ID)
 function AltLogger:getAltPosition()
     local alts = self:loadAlts()
     local currentAlts = {}
@@ -70,7 +64,6 @@ function AltLogger:getAltPosition()
         end
     end
 
-    -- Sort ascending by ID
     table.sort(currentAlts, function(a, b)
         return a.id < b.id
     end)

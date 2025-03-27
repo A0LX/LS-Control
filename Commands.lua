@@ -1,4 +1,3 @@
--- Commands.lua
 local cmds = {}
 local player = game.Players.LocalPlayer
 local cl = _G.LSDropper
@@ -58,7 +57,7 @@ local function getAltIndex()
     return pos or 1
 end
 
--- Example grid-based positioning code
+-- Grid-based positioning
 local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd, y)
     local total = columns * rows
     if index < 1 then index = 1 end
@@ -127,7 +126,6 @@ local function dropBag(amount)
 end
 
 -- Commands:
--- (Same as your original code, just referencing getAltIndex() where needed)
 
 cmds["rejoin"] = function(args, p)
     game:GetService("TeleportService"):Teleport(game.PlaceId, player)

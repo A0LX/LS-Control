@@ -1,4 +1,3 @@
--- Loader.lua
 local config = _G.LSDropper
 
 if (_G.LSLoaded == true) then
@@ -10,16 +9,12 @@ else
     _G.LSLoaded = true 
 end
 
--- Load AltLogger (from your GitHub or local file):
--- Example: local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/YourUser/YourRepo/main/AltLogger.lua"))()
 local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/Log.lua"))()
 
--- Register alt & store in config
 config.AltLogger = AltLogger
 config.myAltId = AltLogger:registerAlt()
 print("AltLogger loaded. My Alt ID:", config.myAltId)
 
--- Limit FPS & disable 3D rendering
 setfpscap(config.fps)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
@@ -65,8 +60,7 @@ end)
 print("Command Handler ready.")
 
 print("Loading Libraries...")
--- If you have extra libraries, load them here
--- e.g.: loadstring(game:HttpGet("https://raw.githubusercontent.com/.../DeleteChairs.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
 print("Libraries loaded.")
 print("LS loaded!")
 
