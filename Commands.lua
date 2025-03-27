@@ -72,24 +72,19 @@ end
 
 local function getBankPosition(altIndex)
     local base = getGridPosition(altIndex, 5, 6, -390, -359, -338, -306, 21)
-    -- Extract only the position from `base`
-    local pos = base.Position
-    -- Create a new CFrame at `pos` with a 0-degree Y-rotation
-    return CFrame.new(pos) * CFrame.Angles(0, math.rad(0), 0)
+    return CFrame.new(base.Position) * CFrame.Angles(0, math.rad(0), 0)
 end
 
 local function getKlubPosition(altIndex)
     local base = getGridPosition(altIndex, 5, 6, -290, -240, -404, -354, -6.2)
-    local pos = base.Position
-    return CFrame.new(pos) * CFrame.Angles(0, math.rad(0), 0)
+    return CFrame.new(base.Position) * CFrame.Angles(0, math.rad(0), 0)
 end
 
 local function getRoofPosition(altIndex)
     local base = getGridPosition(altIndex, 5, 6, -446, -516, -304, -267, 39)
-    local pos = base.Position
-    -- For the roof, set the Y-rotation to 270 degrees
-    return CFrame.new(pos) * CFrame.Angles(0, math.rad(270), 0)
+    return CFrame.new(base.Position) * CFrame.Angles(0, math.rad(270), 0)
 end
+
 
 local trainPositions = {
     [1]  = CFrame.new(600, 34, -150),
