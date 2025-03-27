@@ -12,7 +12,7 @@ end
 
 -- Load AltLogger in Loader.lua
 print("Loading AltLogger...")
-local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/AltLogger.lua"))()
+local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/Log.lua"))()
 config.AltLogger = AltLogger
 config.myAltId = AltLogger:registerAlt()
 print("AltLogger loaded. My Alt ID:", config.myAltId)
