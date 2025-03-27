@@ -10,14 +10,16 @@ else
     _G.LSLoaded = true 
 end
 
--- Load AltLogger in Loader.lua
-print("Loading AltLogger...")
+-- Load AltLogger (from your GitHub or local file):
+-- Example: local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/YourUser/YourRepo/main/AltLogger.lua"))()
 local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/Log.lua"))()
+
+-- Register alt & store in config
 config.AltLogger = AltLogger
 config.myAltId = AltLogger:registerAlt()
 print("AltLogger loaded. My Alt ID:", config.myAltId)
 
--- Limit FPS and disable 3D rendering to reduce overhead.
+-- Limit FPS & disable 3D rendering
 setfpscap(config.fps)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 
@@ -32,7 +34,7 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
 end)
 
-repeat wait() until game:IsLoaded() and game.Players.LocalPlayer.Character ~= nil
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer.Character
 
 print("Loading Command Handler...")
 
@@ -63,7 +65,8 @@ end)
 print("Command Handler ready.")
 
 print("Loading Libraries...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/scripts/DeleteChairs.lua"))()
+-- If you have extra libraries, load them here
+-- e.g.: loadstring(game:HttpGet("https://raw.githubusercontent.com/.../DeleteChairs.lua"))()
 print("Libraries loaded.")
 print("LS loaded!")
 

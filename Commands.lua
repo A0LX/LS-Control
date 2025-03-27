@@ -11,69 +11,54 @@ cDropping = false
 airlock = false
 advertising = false
 
--- HELPER: Parse short-format user input => integer (with debug)
+-- HELPER: parse short input (e.g., "100k", "3m")
 local function parseShortInput(str)
-    print("parseShortInput => raw input:", str)
     if not str then return nil end
     str = string.lower(str)
-    print("parseShortInput => after lower:", str)
-
     local multiplier = 1
     local lastChar = string.sub(str, -1)
-    print("parseShortInput => lastChar:", lastChar)
-
     if lastChar == "m" then
         multiplier = 1000000
         str = string.sub(str, 1, -2)
-        print("parseShortInput => detected 'm', new str:", str, "multiplier:", multiplier)
     elseif lastChar == "k" then
         multiplier = 1000
         str = string.sub(str, 1, -2)
-        print("parseShortInput => detected 'k', new str:", str, "multiplier:", multiplier)
     end
-
     local numeric = tonumber(str)
-    print("parseShortInput => numeric:", numeric)
-
     if not numeric then
         return nil
     end
-
-    local finalVal = math.floor(numeric * multiplier)
-    print("parseShortInput => finalVal:", finalVal)
-    return finalVal
+    return math.floor(numeric * multiplier)
 end
 
--- HELPER: Format large integers in short form
+-- HELPER: format large integers (e.g. 150000 -> "150k")
 local function shortNumber(n)
     if n >= 1000000 then
         local remainder = n % 1000000
         if remainder == 0 then
             return string.format("%dm", n // 1000000)
         else
-            local val = n / 1000000
-            return string.format("%.2fm", val)
+            return string.format("%.2fm", n / 1000000)
         end
     elseif n >= 1000 then
         local remainder = n % 1000
         if remainder == 0 then
             return string.format("%dk", n // 1000)
         else
-            local val = n / 1000
-            return string.format("%.2fk", val)
+            return string.format("%.2fk", n / 1000)
         end
     else
         return tostring(n)
     end
 end
 
--- HELPER: Get alt index using AltLogger (dynamic registration)
+-- HELPER: get dynamic alt index from AltLogger
 local function getAltIndex()
     local pos = _G.LSDropper.AltLogger:getAltPosition()
     return pos or 1
 end
 
--- Helper: compute a grid-based position from alt index.
+-- Example grid-based positioning code
 local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd, y)
     local total = columns * rows
     if index < 1 then index = 1 end
@@ -85,23 +70,19 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
     return CFrame.new(x, y, z)
 end
 
--- Bank:
 local function getBankPosition(altIndex)
     return getGridPosition(altIndex, 5, 6, -390, -359, -338, -306, 21)
 end
 
--- Klub:
 local function getKlubPosition(altIndex)
     return getGridPosition(altIndex, 5, 6, -290, -240, -404, -354, -6.2)
 end
 
--- Roof:
 local function getRoofPosition(altIndex)
     local base = getGridPosition(altIndex, 5, 6, -446, -516, -304, -267, 39)
     return base * CFrame.Angles(0, math.rad(270), 0)
 end
 
--- Train positions
 local trainPositions = {
     [1]  = CFrame.new(600, 34, -150),
     [2]  = CFrame.new(601, 34, -150),
@@ -115,13 +96,10 @@ local trainPositions = {
     [10] = CFrame.new(609, 34, -150),
 }
 
--- Summation of money on the floor
 local function getMoneyOnFloor()
     local total = 0
     local dropFolder = workspace:FindFirstChild("Ignored") and workspace.Ignored:FindFirstChild("Drop")
-    if not dropFolder then
-        return 0
-    end
+    if not dropFolder then return 0 end
     for _, obj in pairs(dropFolder:GetChildren()) do
         if obj.Name == "MoneyDrop" then
             local billboard = obj:FindFirstChild("BillboardGui")
@@ -141,18 +119,17 @@ local function getMoneyOnFloor()
     return total
 end
 
--- Helper to drop
 local function dropBag(amount)
     game.ReplicatedStorage.MainEvent:FireServer("DropMoney", amount)
 end
 
--- /rejoin
+-- Commands:
+-- (Same as your original code, just referencing getAltIndex() where needed)
+
 cmds["rejoin"] = function(args, p)
-    local tpservice = game:GetService("TeleportService")
-    tpservice:Teleport(game.PlaceId, player)
+    game:GetService("TeleportService"):Teleport(game.PlaceId, player)
 end
 
--- /wallet
 cmds["wallet"] = function(args, p)
     local backpack = player.Backpack
     if not wallet then
@@ -168,7 +145,6 @@ cmds["wallet"] = function(args, p)
     end
 end
 
--- /drop
 cmds["drop"] = function(args, p)
     if not dropping then
         dropping = true
@@ -186,71 +162,48 @@ cmds["drop"] = function(args, p)
     end
 end
 
--- /cdrop
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
-    print("[cdrop] => textAmount:", textAmount)
     local numberToAdd = parseShortInput(textAmount)
-    print("[cdrop] => numberToAdd:", numberToAdd)
-
-    local dropFolder = workspace:FindFirstChild("Ignored") and workspace.Ignored:FindFirstChild("Drop")
-    print("[cdrop] => dropFolder found?:", dropFolder)
-
-    if numberToAdd and dropFolder then
+    if numberToAdd then
         dropping = false
         cDropping = true
-
         local oldMoney = getMoneyOnFloor()
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "Started cdrop! $" .. shortNumber(numberToAdd),
-            "All"
-        )
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started cdrop! $"..shortNumber(numberToAdd), "All")
         dropBag(15000)
         coroutine.wrap(function()
             repeat
                 wait(0.5)
                 dropBag(15000)
-            until not dropFolder
-               or not cDropping
-               or (getMoneyOnFloor() >= (oldMoney + numberToAdd))
+            until not cDropping or (getMoneyOnFloor() >= (oldMoney + numberToAdd))
             if cDropping then
                 cDropping = false
                 dropping = false
                 local finalAmount = shortNumber(getMoneyOnFloor())
-                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-                    "Cdrop done! $" .. finalAmount,
-                    "All"
-                )
+                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Cdrop done! $"..finalAmount, "All")
             end
         end)()
     else
-        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-            "Usage: /cdrop <limit> (e.g. /cdrop 500k)",
-            "All"
-        )
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /cdrop <limit> (e.g. /cdrop 500k)", "All")
     end
 end
 
--- /dropped
 cmds["dropped"] = function(args, p)
     local floorTotal = getMoneyOnFloor()
-    local shortValue = shortNumber(floorTotal)
-    local msg = "Current floor total: $" .. shortValue
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
+    local shortVal = shortNumber(floorTotal)
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Current floor total: $"..shortVal, "All")
 end
 
--- /stop
 cmds["stop"] = function(args, p)
     dropping = false
     cDropping = false
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped!", "All")
 end
 
--- Teleport helper
 local function teleportToLocation(loc, anchorAfter)
     local altIdx = getAltIndex() or 1
     local hrp = player.Character.HumanoidRootPart
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(loc .. "!", "All")
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(loc.."!", "All")
     hrp.Anchored = false
     local currentRot = hrp.CFrame - hrp.CFrame.p
     if loc == "bank" then
@@ -268,30 +221,27 @@ local function teleportToLocation(loc, anchorAfter)
     end
 end
 
--- /tp => no anchor after
 cmds["tp"] = function(args, p)
-    if (not args[1] or args[1] == "") then
+    if not args[1] or args[1] == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Please input a valid location.", "All")
         return
     end
     teleportToLocation(string.lower(args[1]), false)
 end
 
--- /tpf => anchor after
 cmds["tpf"] = function(args, p)
-    if (not args[1] or args[1] == "") then
+    if not args[1] or args[1] == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Please input place to teleport to.", "All")
         return
     end
     teleportToLocation(string.lower(args[1]), true)
 end
 
--- /goto
 cmds["goto"] = function(args, p)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
     hrp.Anchored = false
-    if (not args[1] or args[1] == "") then
+    if not args[1] or args[1] == "" then
         local target = game.Workspace:FindFirstChild(p.Name)
         if target and target:FindFirstChild("HumanoidRootPart") then
             hrp.CFrame = target.HumanoidRootPart.CFrame
@@ -306,7 +256,6 @@ cmds["goto"] = function(args, p)
     end
 end
 
--- /airlock
 cmds["airlock"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -332,9 +281,9 @@ cmds["airlock"] = function(args, p)
     platform.Size = Vector3.new(5, 1, 5)
     platform.Anchored = true
     platform.CanCollide = true
-    platform.Position = Vector3.new(currentPos.X, targetY - (platform.Size.Y / 2), currentPos.Z)
+    platform.Position = Vector3.new(currentPos.X, targetY - 0.5, currentPos.Z)
     platform.Parent = workspace
-    hrp.CFrame = CFrame.new(currentPos.X, targetY + (platform.Size.Y / 2), currentPos.Z) * currentRot
+    hrp.CFrame = CFrame.new(currentPos.X, targetY + 0.5, currentPos.Z) * currentRot
     task.wait(0.2)
     hrp.Anchored = true
     airlock = true
@@ -345,7 +294,6 @@ cmds["airlock"] = function(args, p)
     end
 end
 
--- /unairlock
 cmds["unairlock"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -359,14 +307,12 @@ cmds["unairlock"] = function(args, p)
     end
 end
 
--- /spot
 cmds["spot"] = function(args, p)
     if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
         local controllerRoot = p.Character.HumanoidRootPart
         local hrp = player.Character.HumanoidRootPart
         hrp.Anchored = false
-        local targetCFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
-        hrp.CFrame = targetCFrame
+        hrp.CFrame = controllerRoot.CFrame * CFrame.new(0, 0, -2)
         wait(0.3)
         hrp.Anchored = true
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Spot!", "All")
@@ -375,7 +321,6 @@ cmds["spot"] = function(args, p)
     end
 end
 
--- /bring
 cmds["bring"] = function(args, p)
     if not args[1] or args[1] == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /bring <playerName>", "All")
@@ -383,9 +328,9 @@ cmds["bring"] = function(args, p)
     end
     local partial = string.lower(args[1])
     local foundPlayer = nil
-    for _,pl in pairs(game.Players:GetPlayers()) do
-        if string.sub(string.lower(pl.Name),1,#partial) == partial then
-            foundPlayer = pl
+    for _,plr in pairs(game.Players:GetPlayers()) do
+        if string.sub(string.lower(plr.Name),1,#partial) == partial then
+            foundPlayer = plr
             break
         end
     end
@@ -400,21 +345,19 @@ cmds["bring"] = function(args, p)
     end
 end
 
--- /line
 cmds["line"] = function(args, p)
-    if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
+    if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
-        return 
+        return
     end
     local hrp = player.Character.HumanoidRootPart
     hrp.Anchored = false
     local controllerRoot = p.Character.HumanoidRootPart
     local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, 2)
-    local altList = _G.LSDropper.alts or {}
-    local total = #altList
+    local altCount = #(_G.LSDropper.alts or {})
     local myIndex = getAltIndex()
     if not myIndex then return end
-    local mid = (total + 1) / 2
+    local mid = (altCount + 1) / 2
     local offsetDist = (myIndex - mid) * 2
     local rightVec = controllerRoot.CFrame.RightVector
     local targetPos = formationBase.Position + rightVec * offsetDist
@@ -424,27 +367,24 @@ cmds["line"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line!", "All")
 end
 
--- /circle
 cmds["circle"] = function(args, p)
-    if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
+    if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
-        return 
+        return
     end
     local hrp = player.Character.HumanoidRootPart
     hrp.Anchored = false
     local controllerRoot = p.Character.HumanoidRootPart
     local basePos = controllerRoot.Position
-    local altList = _G.LSDropper.alts or {}
-    local total = #altList
+    local altCount = #(_G.LSDropper.alts or {})
     local myIndex = getAltIndex()
     if not myIndex then return end
-    local anglePerAlt = math.rad(360 / total)
+    local anglePerAlt = math.rad(360 / altCount)
     local myAngle = (myIndex - 1) * anglePerAlt
     local rotatedDir = (CFrame.fromAxisAngle(Vector3.new(0,1,0), myAngle)
         * Vector3.new(controllerRoot.CFrame.LookVector.X,
                       controllerRoot.CFrame.LookVector.Y,
-                      controllerRoot.CFrame.LookVector.Z)
-    ).Unit
+                      controllerRoot.CFrame.LookVector.Z)).Unit
     local radius = 4
     if args[1] then
         local r = tonumber(args[1])
@@ -459,7 +399,6 @@ cmds["circle"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle!", "All")
 end
 
--- /hide
 cmds["hide"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -467,15 +406,13 @@ cmds["hide"] = function(args, p)
     if hrp then
         hrp.Anchored = false
         wait(0.1)
-        local currentCFrame = hrp.CFrame
-        hrp.CFrame = CFrame.new(currentCFrame.X, -10, currentCFrame.Z)
+        hrp.CFrame = CFrame.new(hrp.Position.X, -10, hrp.Position.Z)
         wait(0.2)
         hrp.Anchored = true
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Hidden underground!", "All")
     end
 end
 
--- /ad
 cmds["ad"] = function(args, p)
     if advertising then
         advertising = false
@@ -491,7 +428,6 @@ cmds["ad"] = function(args, p)
     end)()
 end
 
--- /admsg
 cmds["admsg"] = function(args, p)
     local text = table.concat(args, " ")
     if text == "" then
@@ -502,22 +438,16 @@ cmds["admsg"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Ad = "..adMessage, "All")
 end
 
--- /code (Redeem code via chat)
 cmds["code"] = function(args, p)
     local codeToRedeem = table.concat(args, " ")
     if codeToRedeem == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /code <SomeDahoodCode>", "All")
         return
     end
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Redeeming code: " .. codeToRedeem, "All")
-    local reqArgs = {
-        [1] = "EnterPromoCode",
-        [2] = codeToRedeem
-    }
-    game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer(unpack(reqArgs))
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Redeeming code: "..codeToRedeem, "All")
+    game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer("EnterPromoCode", codeToRedeem)
 end
 
--- /say
 cmds["say"] = function(args, p)
     local message = table.concat(args, " ")
     if message == "" then
