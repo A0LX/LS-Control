@@ -4,46 +4,58 @@
 
 <b>Commands:</b>
 
-re ~ /re ~ Respawns the bots.
+drop ~ /drop ~~ Starts dropping.
 
-start ~ /start ~ Starts dropping money.
+cdrop ~ /cdrop [(REQUIRED STRING) Amount, 100k - 3m] ~~ Starts dropping until specefied amount is on the ground.
 
-stop ~ /stop ~ Stops dropping money.
+stop ~ /stop ~~ Stops both drop and cdrop.
 
-freeze ~ /freeze ~ Freezes the bots; they won't move.
+wallet ~ /wallet ~~ Equips or unequips the alt's wallets.
 
-chat ~ /chat [(OPTIONAL STRING) Message] ~ Makes all the bots chat a message.
+dropped ~ /dropped ~~ Alt's tell you the amount currently on the ground.
 
-tp ~ /tp [(REQUIRED STRING) Location] ~ Teleports the bots to a specific place.
+tp ~ /tp [(REQUIRED STRING) Location] ~~ Teleports the alt's to the specefied setup location.
 
-tpf ~ /tpf [(REQUIRED STRING) Location] ~ Teleports the bots to a specific place and freezes them.
+tpf ~ /tpf [(REQUIRED STRING) Location] ~~ Teleports the alt's to the specefied setup location and freezes them.
 
-spot ~ /spot ~ Tp's the bots to the controller and freezes them.
+airlock ~ /airlock [(OPTIONAL STRING) Height] ~~ Enables airlock, Default height is 10 studs.
 
-goto ~ /goto [(OPTIONAL STRING) User] ~ Teleports the bots to the operator or specified user.
+unairlock ~ /unairlock ~~ Desables airlock.
 
-rejoin ~ /rejoin ~ Makes the bots rejoin the same server. (DOESN'T WORK ON VIP SERVERS)
+hide ~ /hide ~~ Moves alt's 10 studs underground.
 
-wallet ~ /wallet ~ Equips or unequips the bots wallets.
+spot ~ /spot ~~ Teleports the alt's to the controller and freezes them.
 
-airlock ~ /airlock ~ Toggles airlock.
+line ~ /line ~~ Teleports the alt's in a line behind the controller.
+
+circle ~ /circle ~~ Teleports the alt's in a circle around the controller.
+
+bring ~ /bring [(REQUIRED STRING) User] ~~ Brings the specefied user to controller or specefied location.
+
+goto ~ /goto [(OPTIONAL STRING) User] ~~ Teleports the alt's to the operator or specified user.
+
+rejoin ~ /rejoin ~~ Alt's rejoin the server, Alt's need to have premissions to rejoin private servers.
+
+ad ~ /ad ~~ Alt's start advertising.
+
+admsg ~ /admsg [(REQUIRED STRING) Message] ~~ Updates the advert message.
+
+say ~ /say [(REQUIRED STRING) Message] ~~ Makes all the alt's chat a message.
+
 
 
 
 <b>Locations:</b>
 
-bank ~ Bank Roof (Central)
+bank ~ Bank (Central)
 
-safezone1 ~ Safe Zone Spot 1 (Secret)
+roof ~ Bank roof (Central)
 
-safezone2 ~ Safe Zone Spot 2 (Secret)
+klub ~ Klub (Central)
 
-station ~ Gas Station (Uphill)
-
-taco ~ Taco Shop (Uphill)
 
 <b>Requirements:</b>
 
-Web executors like AWP or Wave - Mumu also works, just make sure to use autoexec
+Web executors like AWP or Wave - Mumu or UG-phone also works, just make sure to use autoexec bc of the anticheat.
 
 Roblox Account Manager - https://github.com/ic3w0lf22/Roblox-Account-Manager/releases
