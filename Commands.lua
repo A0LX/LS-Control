@@ -6,13 +6,13 @@ local adMessage = cl.adx or "LS"
 
 -- Globals
 wallet = false
-dropping = false    -- for /drop
-cDropping = false   -- for /cdrop
+dropping = false
+cDropping = false
 airlock = false
 advertising = false
 
 --
--- 1) HELPER: Parse short-format user input => integer (with debug)
+-- HELPER: Parse short-format user input => integer (with debug)
 --
 local function parseShortInput(str)
     print("parseShortInput => raw input:", str)
@@ -47,7 +47,7 @@ local function parseShortInput(str)
 end
 
 --
--- 2) HELPER: Format large integers in short form
+-- HELPER: Format large integers in short form
 --
 local function shortNumber(n)
     if n >= 1000000 then
@@ -72,7 +72,7 @@ local function shortNumber(n)
 end
 
 --
--- 3) HELPER: Figure out which alt index this local player is.
+-- HELPER: Figure out which alt index this local player is.
 --
 local function getAltIndex()
     local userId = player.UserId
@@ -103,25 +103,24 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
 end
 
 --
--- Bank: 5 columns x 6 rows
+-- Bank:
 --
 local function getBankPosition(altIndex)
     return getGridPosition(
-        altIndex,         -- index
+        altIndex,        -- index
         5, 6,            -- columns, rows
         -390, -359,      -- xStart, xEnd
         -338, -306,      -- zStart, zEnd
         21               -- y
     )
-    -- If you wanted rotation, you’d do e.g. return base * CFrame.Angles(…)
 end
 
 --
--- Klub: 5 columns x 6 rows
+-- Klub:
 --
 local function getKlubPosition(altIndex)
     return getGridPosition(
-        altIndex,          -- index
+        altIndex,         -- index
         5, 6,             -- columns, rows
         -290, -240,       -- xStart, xEnd
         -404, -354,       -- zStart, zEnd
@@ -130,17 +129,16 @@ local function getKlubPosition(altIndex)
 end
 
 --
--- Roof: 5 columns x 6 rows (total 30)
+-- Roof:
 --
 local function getRoofPosition(altIndex)
     local base = getGridPosition(
-        altIndex,    -- alt index
-        5, 6,        -- columns, rows => 30 total
+        altIndex,    -- index
+        5, 6,        -- columns, rows
         -446, -516,  -- xStart, xEnd
         -304, -267,  -- zStart, zEnd
         39           -- y
     )
-    -- Rotate so that “forward” is turned 270 degrees
     return base * CFrame.Angles(0, math.rad(270), 0)
 end
 
@@ -190,15 +188,11 @@ local function getMoneyOnFloor()
 end
 
 --
--- Helper to drop a bag of money
+-- Helper to drop
 --
 local function dropBag(amount)
     game.ReplicatedStorage.MainEvent:FireServer("DropMoney", amount)
 end
-
---------------------------------------------------------------------------
--- Existing Commands
---------------------------------------------------------------------------
 
 -- /rejoin
 cmds["rejoin"] = function(args, p)
@@ -206,7 +200,7 @@ cmds["rejoin"] = function(args, p)
     tpservice:Teleport(game.PlaceId, player)
 end
 
--- /wallet => toggles wallet equip/unequip
+-- /wallet
 cmds["wallet"] = function(args, p)
     local backpack = player.Backpack
     if not wallet then
@@ -226,7 +220,7 @@ end
 cmds["drop"] = function(args, p)
     if not dropping then
         dropping = true
-        cDropping = false  -- turn off custom dropping if it was on
+        cDropping = false  -- turn off cdrop if it was on
 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Started Dropping!", "All")
 
@@ -242,7 +236,7 @@ cmds["drop"] = function(args, p)
     end
 end
 
--- /cdrop with 0.5 s check delay in the loop
+-- /cdrop
 cmds["cdrop"] = function(args, p)
     local textAmount = args[1]
     print("[cdrop] => textAmount:", textAmount)
@@ -290,7 +284,7 @@ cmds["cdrop"] = function(args, p)
     end
 end
 
--- /dropped => checks how much is on the floor
+-- /dropped
 cmds["dropped"] = function(args, p)
     local floorTotal = getMoneyOnFloor()
     local shortValue = shortNumber(floorTotal)
@@ -298,16 +292,15 @@ cmds["dropped"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
 end
 
--- /stop => stops /drop and /cdrop
+-- /stop
 cmds["stop"] = function(args, p)
     dropping = false
     cDropping = false
-    advertising = false  -- also stop advertising
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Stopped!", "All")
 end
 
 --
--- Teleport helper that preserves current rotation.
+-- Teleport helper
 --
 local function teleportToLocation(loc, anchorAfter)
     local altIdx = getAltIndex() or 1
@@ -356,7 +349,7 @@ cmds["tpf"] = function(args, p)
     teleportToLocation(string.lower(args[1]), true)
 end
 
--- /goto => follow the main player's character
+-- /goto
 cmds["goto"] = function(args, p)
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
@@ -378,7 +371,7 @@ cmds["goto"] = function(args, p)
     end
 end
 
--- /airlock => create a temporary platform at specified height
+-- /airlock
 cmds["airlock"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -428,7 +421,7 @@ cmds["airlock"] = function(args, p)
     end
 end
 
--- /unairlock => unanchor
+-- /unairlock
 cmds["unairlock"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -442,7 +435,7 @@ cmds["unairlock"] = function(args, p)
     end
 end
 
--- /spot => stand in front of controlling alt
+-- /spot
 cmds["spot"] = function(args, p)
     if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
         local controllerRoot = p.Character.HumanoidRootPart
@@ -458,7 +451,7 @@ cmds["spot"] = function(args, p)
     end
 end
 
--- /bring => bring target to me
+-- /bring
 cmds["bring"] = function(args, p)
     if not args[1] or args[1] == "" then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Usage: /bring <playerName>", "All")
@@ -485,7 +478,7 @@ cmds["bring"] = function(args, p)
     end
 end
 
--- /line => Arrange alts in a line behind the controller
+-- /line
 cmds["line"] = function(args, p)
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
@@ -495,7 +488,6 @@ cmds["line"] = function(args, p)
     hrp.Anchored = false
     
     local controllerRoot = p.Character.HumanoidRootPart
-    -- Base formation point is 2 studs behind the controller
     local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, 2)
     
     local altList = _G.LSDropper.alts or {}
@@ -516,7 +508,7 @@ cmds["line"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line!", "All")
 end
 
--- /circle => Arrange alts in a circle around the controller
+-- /circle
 cmds["circle"] = function(args, p)
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then 
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
@@ -557,11 +549,7 @@ cmds["circle"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle!", "All")
 end
 
---------------------------------------------------------------------------
--- NEW Commands
---------------------------------------------------------------------------
-
--- /hide => send alt underground (Y = -10 by default)
+-- /hide
 cmds["hide"] = function(args, p)
     local char = player.Character
     if not char then return end
@@ -578,8 +566,7 @@ cmds["hide"] = function(args, p)
     end
 end
 
--- /ad => alts start repeatedly chatting the current ad message
--- (stop with /stop or /ad "" to cancel)
+-- /ad
 cmds["ad"] = function(args, p)
     -- If we're already advertising, toggle it off
     if advertising then
@@ -600,7 +587,7 @@ cmds["ad"] = function(args, p)
 end
 
 
--- /admsg => change the advertising message without restarting the ad loop
+-- /admsg
 cmds["admsg"] = function(args, p)
     local text = table.concat(args, " ")
     if text == "" then
@@ -633,7 +620,7 @@ cmds["code"] = function(args, p)
 end
 
 
--- /say => alt says the provided message once
+-- /say
 cmds["say"] = function(args, p)
     local message = table.concat(args, " ")
     if message == "" then
@@ -643,7 +630,4 @@ cmds["say"] = function(args, p)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
 end
 
---------------------------------------------------------------------------
--- Expose commands to global
---------------------------------------------------------------------------
 _G.LSCommands = cmds
