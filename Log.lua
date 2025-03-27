@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 
 local AltLogger = {}
 
-local workspaceFolder = "workspace"  -- Local workspace folder path
+local workspaceFolder = "AppData/Local/Programs/Wave/workspace"  -- Local workspace folder path
 local altLogFile = workspaceFolder .. "/alts.json"
 
 function AltLogger:loadAlts()
