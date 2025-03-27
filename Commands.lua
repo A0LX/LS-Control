@@ -71,18 +71,18 @@ local function getGridPosition(index, columns, rows, xStart, xEnd, zStart, zEnd,
 end
 
 local function getBankPosition(altIndex)
-    return getGridPosition(altIndex, 5, 6, -390, -359, -338, -306, 21)
-    CFrame.Angles(0, math.rad(0), 0)
+    local base = getGridPosition(altIndex, 5, 6, -390, -359, -338, -306, 21)
+    return base * CFrame.Angles(0, math.rad(0), 0)
 end
 
 local function getKlubPosition(altIndex)
-    return getGridPosition(altIndex, 5, 6, -290, -240, -404, -354, -6.2)
-    CFrame.Angles(0, math.rad(0), 0)
+    local base = getGridPosition(altIndex, 5, 6, -290, -240, -404, -354, -6.2)
+    return base * CFrame.Angles(0, math.rad(0), 0)
 end
 
 local function getRoofPosition(altIndex)
-    return getGridPosition(altIndex, 5, 6, -446, -516, -304, -267, 39)
-    CFrame.Angles(0, math.rad(270), 0)
+    local base = getGridPosition(altIndex, 5, 6, -446, -516, -304, -267, 39)
+    return base * CFrame.Angles(0, math.rad(270), 0)
 end
 
 local trainPositions = {
