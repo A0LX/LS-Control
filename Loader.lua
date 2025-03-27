@@ -1,3 +1,4 @@
+-- Loader.lua
 local config = _G.LSDropper
 
 if (_G.LSLoaded == true) then
@@ -9,7 +10,14 @@ else
     _G.LSLoaded = true 
 end
 
--- Limit to very low FPS to reduce overhead.
+-- Load AltLogger in Loader.lua
+print("Loading AltLogger...")
+local AltLogger = loadstring(game:HttpGet("https://raw.githubusercontent.com/A0LX/LS-Control/refs/heads/main/AltLogger.lua"))()
+config.AltLogger = AltLogger
+config.myAltId = AltLogger:registerAlt()
+print("AltLogger loaded. My Alt ID:", config.myAltId)
+
+-- Limit FPS and disable 3D rendering to reduce overhead.
 setfpscap(config.fps)
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 

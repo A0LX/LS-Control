@@ -4,58 +4,74 @@
 
 <b>Commands:</b>
 
-drop ~ /drop ~~ Starts dropping.
+- **drop** ~ `/drop`  
+  Starts dropping.
 
-cdrop ~ /cdrop [(REQUIRED STRING) Amount, 100k - 3m] ~~ Starts dropping until specefied amount is on the ground.
+- **cdrop** ~ `/cdrop [(REQUIRED STRING) Amount, e.g., 100k - 3m]`  
+  Starts dropping until the specified amount is reached on the ground.
 
-stop ~ /stop ~~ Stops both drop and cdrop.
+- **stop** ~ `/stop`  
+  Stops both drop and cdrop.
 
-wallet ~ /wallet ~~ Equips or unequips the alt's wallets.
+- **wallet** ~ `/wallet`  
+  Equips or unequips the alt's wallet.
 
-dropped ~ /dropped ~~ Alt's tell you the amount currently on the ground.
+- **dropped** ~ `/dropped`  
+  Tells you the current amount on the ground.
 
-tp ~ /tp [(REQUIRED STRING) Location] ~~ Teleports the alt's to the specefied setup location.
+- **tp** ~ `/tp [(REQUIRED STRING) Location]`  
+  Teleports the alt to the specified location.
 
-tpf ~ /tpf [(REQUIRED STRING) Location] ~~ Teleports the alt's to the specefied setup location and freezes them.
+- **tpf** ~ `/tpf [(REQUIRED STRING) Location]`  
+  Teleports the alt to the specified location and freezes them.
 
-airlock ~ /airlock [(OPTIONAL STRING) Height] ~~ Enables airlock, Default height is 10 studs.
+- **airlock** ~ `/airlock [(OPTIONAL STRING) Height]`  
+  Enables airlock (default height is 10 studs).
 
-unairlock ~ /unairlock ~~ Desables airlock.
+- **unairlock** ~ `/unairlock`  
+  Disables airlock.
 
-hide ~ /hide ~~ Moves alt's 10 studs underground.
+- **hide** ~ `/hide`  
+  Moves the alt 10 studs underground.
 
-spot ~ /spot ~~ Teleports the alt's to the controller and freezes them.
+- **spot** ~ `/spot`  
+  Teleports the alt to the controller and freezes them.
 
-line ~ /line ~~ Teleports the alt's in a line behind the controller.
+- **line** ~ `/line`  
+  Teleports the alts in a line behind the controller.
 
-circle ~ /circle ~~ Teleports the alt's in a circle around the controller.
+- **circle** ~ `/circle`  
+  Teleports the alts in a circle around the controller.
 
-bring ~ /bring [(REQUIRED STRING) User] ~~ Brings the specefied user to controller or specefied location.
+- **bring** ~ `/bring [(REQUIRED STRING) User]`  
+  Brings the specified user to the controller or location.
 
-goto ~ /goto [(OPTIONAL STRING) User] ~~ Teleports the alt's to the operator or specified user.
+- **goto** ~ `/goto [(OPTIONAL STRING) User]`  
+  Teleports the alt to the operator or specified user.
 
-rejoin ~ /rejoin ~~ Alt's rejoin the server, Alt's need to have premissions to rejoin private servers.
+- **rejoin** ~ `/rejoin`  
+  Makes the alt rejoin the server (requires proper permissions).
 
-ad ~ /ad ~~ Alt's start advertising.
+- **ad** ~ `/ad`  
+  Starts advertising.
 
-admsg ~ /admsg [(REQUIRED STRING) Message] ~~ Updates the advert message.
+- **admsg** ~ `/admsg [(REQUIRED STRING) Message]`  
+  Updates the advertisement message.
 
-say ~ /say [(REQUIRED STRING) Message] ~~ Makes all the alt's chat a message.
+- **say** ~ `/say [(REQUIRED STRING) Message]`  
+  Makes the alt chat a message.
 
+<b>Alt Handling:</b>
 
-
+Alts now automatically log themselves when the script is executed. The logging system is managed in a separate file (**AltLogger.lua**) that saves a JSON file (located in your local workspace folder) with each alt’s unique numerical ID. When multiple alts are in-game, they detect one another and dynamically sort by their registered IDs—ensuring that lower-numbered slots are always filled first.
 
 <b>Locations:</b>
 
-bank ~ Bank (Central)
-
-roof ~ Bank roof (Central)
-
-klub ~ Klub (Central)
-
+- **bank** ~ Bank (Central)
+- **roof** ~ Bank roof (Central)
+- **klub** ~ Klub (Central)
 
 <b>Requirements:</b>
 
-Web executors like AWP or Wave - Mumu or UG-phone also works, just make sure to use autoexec bc of the anticheat.
-
-Roblox Account Manager - https://github.com/ic3w0lf22/Roblox-Account-Manager/releases
+- **Web executors:** AWP, Wave, Mumu, or UG-phone (use autoexec because of anticheat restrictions).
+- **Roblox Account Manager:** [Download here](https://github.com/ic3w0lf22/Roblox-Account-Manager/releases)
