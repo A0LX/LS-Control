@@ -347,98 +347,58 @@ cmds["bring"] = function(args, p)
 end
 
 cmds["line"] = function(args, p)
-    -- Ensure the controller's HumanoidRootPart exists
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
         return
     end
-    
-    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    
+    local hrp = player.Character.HumanoidRootPart
     hrp.Anchored = false
-    
     local controllerRoot = p.Character.HumanoidRootPart
+    local formationBase = controllerRoot.CFrame * CFrame.new(0, 0, 2)
     local altCount = #(_G.LSDropper.alts or {})
-    local myIndex = getAltIndex()  -- which alt am I (1-based)
-    if altCount == 0 or (not myIndex) then return end
-    
-    -- The distance directly behind the controller (negative LookVector)
-    local behindDist = 2
-    
-    -- Horizontal spacing between each alt
-    local spacing = 3
-
-    -- 1) Find the "center" of the line, which is 2 studs behind the controller
-    local centerPos = controllerRoot.Position - (controllerRoot.CFrame.LookVector * behindDist)
-
-    -- 2) We'll spread alts left & right around that center. If there are N alts, 
-    --    the leftmost offset is -(N-1)/2 * spacing, and each alt is spaced by 'spacing'.
-    --    Example: if N=5, offsets are -6, -3, 0, 3, 6 (with spacing=3).
-    
-    local leftMostOffset = -((altCount - 1) / 2) * spacing
-    local myOffset = leftMostOffset + (myIndex - 1) * spacing
-    
-    -- 3) Move the alt horizontally by myOffset along the controller's RightVector
+    local myIndex = getAltIndex()
+    if not myIndex then return end
+    local mid = (altCount + 1) / 2
+    local offsetDist = (myIndex - mid) * 2
     local rightVec = controllerRoot.CFrame.RightVector
-    local targetPos = centerPos + (rightVec * myOffset)
-    
-    -- 4) Make each alt face the same direction as the controller
-    --    We can "look at" a point in front of us by using the controller's LookVector.
+    local targetPos = formationBase.Position + rightVec * offsetDist
     hrp.CFrame = CFrame.new(targetPos, targetPos + controllerRoot.CFrame.LookVector)
-    
-    task.wait(0.3)
+    wait(0.3)
     hrp.Anchored = true
-    
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Line!", "All")
 end
 
-
 cmds["circle"] = function(args, p)
-    -- Ensure the controller's HumanoidRootPart exists
     if not (p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")) then
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Controller not found.", "All")
         return
     end
-
-    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-
+    local hrp = player.Character.HumanoidRootPart
     hrp.Anchored = false
-
     local controllerRoot = p.Character.HumanoidRootPart
     local basePos = controllerRoot.Position
-
     local altCount = #(_G.LSDropper.alts or {})
     local myIndex = getAltIndex()
-    if altCount == 0 or (not myIndex) then return end
-
-    -- Default circle radius
+    if not myIndex then return end
+    local anglePerAlt = math.rad(360 / altCount)
+    local myAngle = (myIndex - 1) * anglePerAlt
+    local rotatedDir = (CFrame.fromAxisAngle(Vector3.new(0,1,0), myAngle)
+        * Vector3.new(controllerRoot.CFrame.LookVector.X,
+                      controllerRoot.CFrame.LookVector.Y,
+                      controllerRoot.CFrame.LookVector.Z)).Unit
     local radius = 4
     if args[1] then
-        local customRadius = tonumber(args[1])
-        if customRadius then
-            radius = customRadius
+        local r = tonumber(args[1])
+        if r then
+            radius = r
         end
     end
-
-    -- Each alt uses an evenly spaced angle around the controller
-    local anglePerAlt = 2 * math.pi / altCount
-    local myAngle = anglePerAlt * (myIndex - 1)
-
-    -- Convert polar to Cartesian (keeping Y the same as the controller)
-    local offsetX = radius * math.cos(myAngle)
-    local offsetZ = radius * math.sin(myAngle)
-    local targetPos = Vector3.new(basePos.X + offsetX, basePos.Y, basePos.Z + offsetZ)
-
-    -- Face the center (the controller)
-    hrp.CFrame = CFrame.new(targetPos, Vector3.new(basePos.X, basePos.Y, basePos.Z))
-
+    local targetPos = basePos + rotatedDir * radius
+    hrp.CFrame = CFrame.new(targetPos, basePos)
     wait(0.3)
     hrp.Anchored = true
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Circle!", "All")
 end
-
 
 cmds["hide"] = function(args, p)
     local char = player.Character
